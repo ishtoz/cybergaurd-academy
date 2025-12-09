@@ -136,12 +136,15 @@ const ComputerScreen = ({ isOpen, onClose }) => {
   useEffect(() => {
     const handleDialogueEvent = (event) => {
       console.log('📥 Dialogue event received:', event.detail);
-      const { name, text, isWhiteboard } = event.detail;
-      setDialogue({ name, text, isWhiteboard: isWhiteboard || false });
+      const { name, text, isWhiteboard, onClose: onDialogueClose } = event.detail;
+      setDialogue({ name, text, isWhiteboard: isWhiteboard || false, onClose: onDialogueClose });
       console.log('💾 Dialogue state set to:', { name, text, isWhiteboard });
       // Auto-close after 8 seconds (unless it's whiteboard)
       if (!isWhiteboard) {
-        setTimeout(() => setDialogue(null), 8000);
+        setTimeout(() => {
+          if (onDialogueClose) onDialogueClose();
+          setDialogue(null);
+        }, 8000);
       }
     };
 
@@ -613,7 +616,10 @@ const ComputerScreen = ({ isOpen, onClose }) => {
                 <h2>{dialogue.name}</h2>
                 <button 
                   className="whiteboard-close" 
-                  onClick={() => setDialogue(null)}
+                  onClick={() => {
+                    if (dialogue.onClose) dialogue.onClose();
+                    setDialogue(null);
+                  }}
                   title="Close (X)"
                 >×</button>
               </div>
@@ -635,7 +641,10 @@ const ComputerScreen = ({ isOpen, onClose }) => {
                 <strong>{dialogue.name}</strong>
                 <button 
                   className="dialogue-close" 
-                  onClick={() => setDialogue(null)}
+                  onClick={() => {
+                    if (dialogue.onClose) dialogue.onClose();
+                    setDialogue(null);
+                  }}
                   title="Close (ESC or X)"
                 >×</button>
               </div>

@@ -25,6 +25,9 @@ class MainScene extends Phaser.Scene {
     this.dialogueBox = null; // 💬 Dialogue box at bottom
     this.whiteboardPage = 0; // 📋 Whiteboard page tracker (0=intro, 1=progress)
     this.whiteboardOpen = false; // 📋 Whiteboard is open
+    
+    // 🎮 Progression system
+    this.gameProgress = 'start'; // Progression states: start → hr_welcome → hr_whiteboard → senior_dev → unlocked
   }
 
   preload() {
@@ -423,6 +426,11 @@ class MainScene extends Phaser.Scene {
         );
         
         if (distance < interactionRadius) {
+            // Check if this interaction is allowed based on game progression
+            if (!this.isInteractionAllowed(item.name)) {
+                return; // Skip this interaction, it's not unlocked yet
+            }
+            
             if (!nearestTarget || distance < nearestTarget.distance) {
                 nearestTarget = { zone: item.zone, distance: distance };
                 nearestData = item;
@@ -495,6 +503,38 @@ class MainScene extends Phaser.Scene {
     window.dispatchEvent(new CustomEvent('closeDialogue', {}));
   }
 
+  // 🎮 Check if an interaction is allowed based on current game progression
+  isInteractionAllowed(interactionName) {
+    const progress = this.gameProgress;
+    
+    // At the start, only HR manager is interactable
+    if (progress === 'start') {
+      return interactionName === 'NPC#1 HR manager';
+    }
+    
+    // After first HR dialogue, only HR for the whiteboard tip
+    if (progress === 'hr_welcome') {
+      return interactionName === 'NPC#1 HR manager';
+    }
+    
+    // After HR gives whiteboard tip, only Senior Dev is interactable
+    if (progress === 'hr_whiteboard') {
+      return interactionName === 'NPC#3 The Senior Dev';
+    }
+    
+    // After Senior Dev, bookshelf, note, and whiteboard become interactable
+    if (progress === 'senior_dev') {
+      return ['Bookshelves', 'note', 'whiteboard', 'NPC#3 The Senior Dev'].includes(interactionName);
+    }
+    
+    // After note interaction, main computer becomes interactable
+    if (progress === 'unlocked') {
+      return true; // Everything is interactable
+    }
+    
+    return false;
+  }
+
   handleInteraction() {
     if (!this.currentHoveredObject) {
       console.log('❌ No hovered object');
@@ -505,21 +545,79 @@ class MainScene extends Phaser.Scene {
     const props = item.properties || {};
     
     console.log('🎯 Interaction triggered with:', item.name, props);
+    console.log('📊 Current progress:', this.gameProgress);
     
     // Get username from localStorage for personalized messages
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const username = user.username || 'Employee';
 
-    // Special handler for HR manager with personalized welcome
+    // Special handler for HR manager
     if (item.name === 'NPC#1 HR manager') {
       console.log('💬 Showing HR Manager dialogue...');
-      const welcomeMessage = `Hi ${username}! Welcome to CyberGuard Academy! 👋\n\nHere you will be working on phishing email detection and cybersecurity awareness in various fields. It's a critical role in protecting our organization from cyber threats.\n\nFeel free to check the whiteboard at the top of the office to see what tasks you have left and your progress. Also, don't hesitate to talk to our Senior Dev David who is at the right side of the office if you need any help or have questions.\n\nGood luck! 🚀`;
       
-      console.log('📢 Dispatching showDialogue event...');
+      if (this.gameProgress === 'start') {
+        // First interaction with HR - welcome message
+        const welcomeMessage = `Hi ${username}! Welcome to CyberGuard Academy!\n\nYou'll be working on phishing email detection and cybersecurity awareness. It's a critical role in protecting our organization from cyber threats and keeping our employees safe from social engineering attacks.\n\nWe need sharp eyes and careful analysis to identify malicious emails before they can cause damage.`;
+        
+        window.dispatchEvent(new CustomEvent('showDialogue', { 
+          detail: { 
+            name: 'HR Manager', 
+            text: welcomeMessage,
+            onClose: () => {
+              console.log('🔄 Moving to hr_welcome state');
+              this.gameProgress = 'hr_welcome';
+            }
+          } 
+        }));
+      } else if (this.gameProgress === 'hr_welcome') {
+        // Second interaction with HR - whiteboard pointer
+        const whiteboardMessage = `One more thing - you can check the whiteboard at the top of the office to see your progress and any incomplete tasks. It'll help you stay organized and see what still needs to be done.\n\nGood luck!`;
+        
+        window.dispatchEvent(new CustomEvent('showDialogue', { 
+          detail: { 
+            name: 'HR Manager', 
+            text: whiteboardMessage,
+            onClose: () => {
+              console.log('🔄 Moving to hr_whiteboard state');
+              this.gameProgress = 'hr_whiteboard';
+            }
+          } 
+        }));
+      }
+    }
+    // Special handler for Senior Dev - unlocks more interactions
+    else if (item.name === 'NPC#3 The Senior Dev') {
+      console.log('💬 Showing Senior Dev dialogue...');
+      const devMessage = `Hey there! I'm David, the Senior Developer. If you need any help with the email analysis or have questions about what you're looking at, feel free to come back and ask.\n\nAlso, check out the note on the desk next to me - it has some useful tips for identifying phishing emails.`;
+      
       window.dispatchEvent(new CustomEvent('showDialogue', { 
         detail: { 
-          name: 'HR Manager', 
-          text: welcomeMessage
+          name: 'Senior Dev', 
+          text: devMessage,
+          onClose: () => {
+            if (this.gameProgress === 'hr_whiteboard') {
+              console.log('🔄 Moving to senior_dev state');
+              this.gameProgress = 'senior_dev';
+            }
+          }
+        } 
+      }));
+    }
+    // Special handler for the note - unlocks main computer
+    else if (item.name === 'note') {
+      console.log('📝 Showing note from senior dev...');
+      const noteMessage = `Tips for Identifying Phishing Emails:\n\n1. Check the sender's email address - does it look official?\n2. Look for urgent language or threats\n3. Watch for requests for personal information\n4. Be suspicious of unexpected attachments\n5. Hover over links to see the real URL\n6. Check the tone - real company emails are professional\n\nReady to analyze emails? The computer in the main area has your inbox.`;
+      
+      window.dispatchEvent(new CustomEvent('showDialogue', { 
+        detail: { 
+          name: 'Note from Senior Dev', 
+          text: noteMessage,
+          onClose: () => {
+            if (this.gameProgress === 'senior_dev') {
+              console.log('🔄 Moving to unlocked state');
+              this.gameProgress = 'unlocked';
+            }
+          }
         } 
       }));
     }
@@ -536,6 +634,17 @@ class MainScene extends Phaser.Scene {
       this.whiteboardOpen = true;
       this.whiteboardPage = 0;
       this.showWhiteboardPage();
+    }
+    // Bookshelf interaction
+    else if (item.name === 'Bookshelves') {
+      console.log('📚 Showing bookshelf dialogue...');
+      const bookMessage = `A collection of cybersecurity and office management books. Nothing particularly useful for your current task, but you could learn more about security protocols if you had the time.`;
+      window.dispatchEvent(new CustomEvent('showDialogue', { 
+        detail: { 
+          name: 'Bookshelves', 
+          text: bookMessage
+        } 
+      }));
     }
     else if (props.module) {
       console.log('📂 Opening module:', props.module);
