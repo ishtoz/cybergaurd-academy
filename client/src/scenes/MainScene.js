@@ -18,7 +18,9 @@ class MainScene extends Phaser.Scene {
     this.spawnX = 0;
     this.spawnY = 0;
     this.interactText = null;
-    this.interactionRadius = 60; 
+    this.interactionRadius = 60;
+    this.playerHitbox = null; // 🎯 Character hitbox
+    this.dialogueBox = null; // 💬 Dialogue box at bottom
   }
 
   preload() {
@@ -192,6 +194,11 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player);
     this.cameras.main.setZoom(1.0);
+
+    // 🎯 Draw character hitbox (blue circle around player)
+    this.playerHitbox = this.add.graphics();
+    this.playerHitbox.lineStyle(2, 0x0099ff, 0.7);
+    this.playerHitbox.strokeCircle(0, 0, 40); // 40px radius detection circle
   }
 
   setupInteractions() {
@@ -357,6 +364,11 @@ class MainScene extends Phaser.Scene {
     if (vx !== 0 && vy !== 0) { vx *= 0.7071; vy *= 0.7071; }
     this.player.setVelocity(vx, vy);
 
+    // 🎯 Update character hitbox position to follow player
+    if (this.playerHitbox) {
+      this.playerHitbox.setPosition(this.player.x, this.player.y);
+    }
+
     // Check for nearby interactable objects
     const interactionRadius = 80;
     let nearestTarget = null;
@@ -391,16 +403,47 @@ class MainScene extends Phaser.Scene {
   }
 
   handleInteraction() {
-    if (!this.currentHoveredObject) return;
+    if (!this.currentHoveredObject) {
+      console.log('❌ No hovered object');
+      return;
+    }
 
     const item = this.currentHoveredObject;
     const props = item.properties || {};
     
+    console.log('🎯 Interaction triggered with:', item.name, props);
+    
+    // Get username from localStorage for personalized messages
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const username = user.username || 'Employee';
+
+    // Special handler for HR manager with personalized welcome
+    if (item.name === 'NPC#1 HR manager') {
+      console.log('💬 Showing HR Manager dialogue...');
+      const welcomeMessage = `Hi ${username}! Welcome to CyberGuard Academy! 👋\n\nHere you will be working on phishing email detection and cybersecurity awareness in various fields. It's a critical role in protecting our organization from cyber threats.\n\nFeel free to check the whiteboard at the top of the office to see what tasks you have left and your progress. Also, don't hesitate to talk to our Senior Dev David who is at the right side of the office if you need any help or have questions.\n\nGood luck! 🚀`;
+      
+      console.log('📢 Dispatching showDialogue event...');
+      window.dispatchEvent(new CustomEvent('showDialogue', { 
+        detail: { 
+          name: 'HR Manager', 
+          text: welcomeMessage
+        } 
+      }));
+    }
+    // Special handler for main computer - open email client
+    else if (item.name === 'main computer') {
+      console.log('💻 Opening Email Client...');
+      window.dispatchEvent(new CustomEvent('openEmailClient', { 
+        detail: {} 
+      }));
+    }
     // Dispatch event for ComputerScreen to handle
-    if (props.module) {
+    else if (props.module) {
+      console.log('📂 Opening module:', props.module);
       window.dispatchEvent(new CustomEvent('openModule', { detail: { module: props.module } }));
     } else if (props.dialogue || props.message1) {
       const dialogueText = props.dialogue || props.message1;
+      console.log('💬 Showing dialogue:', dialogueText);
       window.dispatchEvent(new CustomEvent('showDialogue', { 
         detail: { 
           name: item.name, 
@@ -408,6 +451,7 @@ class MainScene extends Phaser.Scene {
         } 
       }));
     } else if (props.clue) {
+      console.log('💡 Showing clue:', props.clue);
       window.dispatchEvent(new CustomEvent('showDialogue', { 
         detail: { 
           name: item.name, 
@@ -415,7 +459,7 @@ class MainScene extends Phaser.Scene {
         } 
       }));
     } else {
-      console.log(`Interacted with: ${item.name}`, props);
+      console.log(`⚠️ Interacted with: ${item.name}`, props);
     }
   }
 }

@@ -33,7 +33,31 @@ const ComputerScreen = ({ isOpen, onClose }) => {
   const [sidebarWidth, setSidebarWidth] = useState(220);
   const [notification, setNotification] = useState(null);
   const [showFlash, setShowFlash] = useState(false);
+  const [dialogue, setDialogue] = useState(null); // 💬 Dialogue box state
   const sidebarRef = React.useRef(null);
+
+  // Disable Phaser keyboard input when ComputerScreen modal is open
+  useEffect(() => {
+    if (isOpen) {
+      const scenes = window.__PHASER_SCENES;
+      if (scenes) {
+        scenes.forEach(scene => {
+          if (scene && scene.input && scene.input.keyboard) {
+            scene.input.keyboard.enabled = false;
+          }
+        });
+      }
+      return () => {
+        if (scenes) {
+          scenes.forEach(scene => {
+            if (scene && scene.input && scene.input.keyboard) {
+              scene.input.keyboard.enabled = true;
+            }
+          });
+        }
+      };
+    }
+  }, [isOpen]);
 
   // Handle sidebar resize
   useEffect(() => {
@@ -68,6 +92,22 @@ const ComputerScreen = ({ isOpen, onClose }) => {
       }
     };
   }, [sidebarWidth]);
+
+  // 💬 Listen for dialogue events from the game
+  useEffect(() => {
+    const handleDialogueEvent = (event) => {
+      console.log('📥 Dialogue event received:', event.detail);
+      const { name, text } = event.detail;
+      setDialogue({ name, text });
+      console.log('💾 Dialogue state set to:', { name, text });
+      // Auto-close after 8 seconds
+      setTimeout(() => setDialogue(null), 8000);
+    };
+
+    window.addEventListener('showDialogue', handleDialogueEvent);
+    console.log('✅ showDialogue listener registered');
+    return () => window.removeEventListener('showDialogue', handleDialogueEvent);
+  }, []);
 
   const analyzeEmail = (email) => {
     setSelectedEmail(email);
@@ -308,6 +348,11 @@ const ComputerScreen = ({ isOpen, onClose }) => {
     }
 
     const handleKeyDown = (e) => {
+      // Don't interfere with form inputs
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+
       if (e.code === 'Escape') {
         onClose();
       }
@@ -504,6 +549,27 @@ const ComputerScreen = ({ isOpen, onClose }) => {
 
         {/* Close Button */}
         <button className="screen-close" onClick={onClose} title="Close (ESC)">×</button>
+
+        {/* 💬 Dialogue Box at Bottom */}
+        {dialogue && (
+          <div className="dialogue-box-container">
+            <div className="dialogue-box">
+              <div className="dialogue-header">
+                <strong>{dialogue.name}</strong>
+                <button 
+                  className="dialogue-close" 
+                  onClick={() => setDialogue(null)}
+                  title="Close (ESC)"
+                >×</button>
+              </div>
+              <div className="dialogue-text">
+                {dialogue.text.split('\n').map((line, idx) => (
+                  <div key={idx}>{line}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

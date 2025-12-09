@@ -282,7 +282,7 @@
 
 .email-row.phishing-row,
 .email-row.safe-row {
-  /* Remove background colors - both use same styles */
+  background: #e8e8e8;
 }
 
 .email-from {
@@ -948,4 +948,113 @@
   font-size: 13px;
   color: #333;
   line-height: 1.4;
+}
+
+/* 💬 Dialogue Box Styles */
+.dialogue-box-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  max-width: 90%;
+  width: 600px;
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.dialogue-box {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 2px solid #0f3460;
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.dialogue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(15, 52, 96, 0.5);
+}
+
+.dialogue-header strong {
+  color: #00d4ff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.dialogue-close {
+  background: transparent;
+  border: none;
+  color: #00d4ff;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.dialogue-close:hover {
+  opacity: 1;
+}
+
+.dialogue-text {
+  color: #e0e0e0;
+  font-size: 13px;
+  line-height: 1.6;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.dialogue-text div {
+  margin-bottom: 4px;
+}
+
+.dialogue-text div:last-child {
+  margin-bottom: 0;
+}
+
+/* Scrollbar styling for dialogue */
+.dialogue-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialogue-text::-webkit-scrollbar-track {
+  background: rgba(15, 52, 96, 0.3);
+  border-radius: 3px;
+}
+
+.dialogue-text::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.5);
+  border-radius: 3px;
+}
+
+.dialogue-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.7);
 }

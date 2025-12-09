@@ -51,6 +51,11 @@ const BoardView = ({ isOpen, content, onClose }) => {
     if (!isOpen) return;
 
     const handleKeyDown = (e) => {
+      // Don't interfere with form inputs
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+
       if (e.code === 'Escape' || (e.code === 'Space' && isComplete)) {
         onClose();
       }

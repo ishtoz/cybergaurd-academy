@@ -1,11 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCanvas from '../components/GameCanvas';
+import EmailClient from '../components/EmailClient';
 import './Dashboard.css';
 
 function Dashboard() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [showEmailClient, setShowEmailClient] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleOpenEmailClient = () => {
+      console.log('📧 Opening email client from game');
+      setShowEmailClient(true);
+    };
+    window.addEventListener('openEmailClient', handleOpenEmailClient);
+    return () => window.removeEventListener('openEmailClient', handleOpenEmailClient);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -29,6 +40,9 @@ function Dashboard() {
           <GameCanvas />
         </div>
       </div>
+      
+      {/* 📧 Email Client Modal */}
+      <EmailClient isOpen={showEmailClient} onClose={() => setShowEmailClient(false)} />
     </div>
   );
 }

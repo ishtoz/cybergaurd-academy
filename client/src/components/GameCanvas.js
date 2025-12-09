@@ -29,6 +29,12 @@ function GameCanvas() {
     // Create Phaser game instance
     phaserGameRef.current = new Phaser.Game(config);
 
+    // Store scenes globally for keyboard control
+    window.__PHASER_GAME = phaserGameRef.current;
+    if (phaserGameRef.current && phaserGameRef.current.scene) {
+      window.__PHASER_SCENES = phaserGameRef.current.scene.scenes;
+    }
+
     console.log('GameCanvas: Phaser game initialized');
 
     // Cleanup function to destroy game instance on unmount

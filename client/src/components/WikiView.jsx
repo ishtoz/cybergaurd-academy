@@ -351,12 +351,19 @@ You don't need to be a tech expert to stay safe. You just need to slow down and 
     if (!isOpen) return;
 
     const handleKeyDown = (e) => {
+      // Don't interfere with form inputs - check if focus is on input/textarea
+      const isFormInput = document.activeElement?.tagName === 'INPUT' || 
+                         document.activeElement?.tagName === 'TEXTAREA';
+      if (isFormInput) {
+        return;
+      }
+
       if (e.code === 'Escape') {
         onClose();
-      } else if (e.code === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+      } else if (e.code === 'ArrowLeft') {
         e.preventDefault();
         setCurrentPage((prev) => (prev > 0 ? prev - 1 : pages.length - 1));
-      } else if (e.code === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+      } else if (e.code === 'ArrowRight') {
         e.preventDefault();
         setCurrentPage((prev) => (prev < pages.length - 1 ? prev + 1 : 0));
       }
