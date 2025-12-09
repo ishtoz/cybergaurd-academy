@@ -97,16 +97,27 @@ const ComputerScreen = ({ isOpen, onClose }) => {
   useEffect(() => {
     const handleDialogueEvent = (event) => {
       console.log('📥 Dialogue event received:', event.detail);
-      const { name, text } = event.detail;
-      setDialogue({ name, text });
-      console.log('💾 Dialogue state set to:', { name, text });
-      // Auto-close after 8 seconds
-      setTimeout(() => setDialogue(null), 8000);
+      const { name, text, isWhiteboard } = event.detail;
+      setDialogue({ name, text, isWhiteboard: isWhiteboard || false });
+      console.log('💾 Dialogue state set to:', { name, text, isWhiteboard });
+      // Auto-close after 8 seconds (unless it's whiteboard)
+      if (!isWhiteboard) {
+        setTimeout(() => setDialogue(null), 8000);
+      }
+    };
+
+    const handleCloseDialogue = () => {
+      console.log('📤 Close dialogue event received');
+      setDialogue(null);
     };
 
     window.addEventListener('showDialogue', handleDialogueEvent);
-    console.log('✅ showDialogue listener registered');
-    return () => window.removeEventListener('showDialogue', handleDialogueEvent);
+    window.addEventListener('closeDialogue', handleCloseDialogue);
+    console.log('✅ showDialogue & closeDialogue listeners registered');
+    return () => {
+      window.removeEventListener('showDialogue', handleDialogueEvent);
+      window.removeEventListener('closeDialogue', handleCloseDialogue);
+    };
   }, []);
 
   const analyzeEmail = (email) => {
@@ -559,13 +570,19 @@ const ComputerScreen = ({ isOpen, onClose }) => {
                 <button 
                   className="dialogue-close" 
                   onClick={() => setDialogue(null)}
-                  title="Close (ESC)"
+                  title="Close (ESC or X)"
                 >×</button>
               </div>
               <div className="dialogue-text">
                 {dialogue.text.split('\n').map((line, idx) => (
                   <div key={idx}>{line}</div>
                 ))}
+              </div>
+              {dialogue.isWhiteboard && (
+                <div style={{ marginTop: '12px', fontSize: '12px', color: '#00d4ff', fontStyle: 'italic', textAlign: 'center' }}>
+                  Press X to close | Press Z for next page
+                </div>
+              )}
               </div>
             </div>
           </div>

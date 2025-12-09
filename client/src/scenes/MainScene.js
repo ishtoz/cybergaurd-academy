@@ -10,6 +10,8 @@ class MainScene extends Phaser.Scene {
     this.cursors = null;
     this.wasdKeys = null;
     this.spaceKey = null;
+    this.xKey = null;
+    this.zKey = null;
     this.resetKeys = null;
     this.map = null;
     this.collisionsLayer = null;
@@ -21,6 +23,8 @@ class MainScene extends Phaser.Scene {
     this.interactionRadius = 60;
     this.playerHitbox = null; // 🎯 Character hitbox
     this.dialogueBox = null; // 💬 Dialogue box at bottom
+    this.whiteboardPage = 0; // 📋 Whiteboard page tracker (0=intro, 1=progress)
+    this.whiteboardOpen = false; // 📋 Whiteboard is open
   }
 
   preload() {
@@ -343,6 +347,8 @@ class MainScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.wasdKeys = this.input.keyboard.addKeys({ W: 87, A: 65, S: 83, D: 68 });
     this.spaceKey = this.input.keyboard.addKey(32);
+    this.xKey = this.input.keyboard.addKey(88); // X key
+    this.zKey = this.input.keyboard.addKey(90); // Z key
     this.resetKeys = this.input.keyboard.addKeys({ R: 82, H: 72 });
   }
 
@@ -400,6 +406,55 @@ class MainScene extends Phaser.Scene {
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) this.handleInteraction();
+    
+    // Handle whiteboard page navigation
+    if (this.whiteboardOpen) {
+      if (Phaser.Input.Keyboard.JustDown(this.xKey)) {
+        this.closeWhiteboard();
+      }
+      if (Phaser.Input.Keyboard.JustDown(this.zKey)) {
+        this.whiteboardPage = (this.whiteboardPage + 1) % 2;
+        this.showWhiteboardPage();
+      }
+    }
+  }
+
+  showWhiteboardPage() {
+    if (this.whiteboardPage === 0) {
+      // Page 1: Phishing attack warning
+      const message = `⚠️  SECURITY ALERT ⚠️\n\nThe company is currently facing multiple phishing attack emails designed to compromise our security infrastructure.\n\nYour mission: Identify and filter these malicious emails to protect company data and employee accounts.\n\nBe vigilant. Stay focused.\n\n[Press X to close | Press Z for progress]`;
+      window.dispatchEvent(new CustomEvent('showDialogue', { 
+        detail: { 
+          name: 'WHITEBOARD - Page 1/2', 
+          text: message,
+          isWhiteboard: true
+        } 
+      }));
+    } else if (this.whiteboardPage === 1) {
+      // Page 2: Show email count remaining
+      const emailCountLeft = this.getEmailCountRemaining();
+      const message = `📊 CURRENT PROGRESS 📊\n\nEmails remaining in Inbox:\n${emailCountLeft} email${emailCountLeft !== 1 ? 's' : ''} left to filter\n\nKeep working until your inbox is clear!\n\n[Press X to close | Press Z to go back]`;
+      window.dispatchEvent(new CustomEvent('showDialogue', { 
+        detail: { 
+          name: 'WHITEBOARD - Page 2/2', 
+          text: message,
+          isWhiteboard: true
+        } 
+      }));
+    }
+  }
+
+  getEmailCountRemaining() {
+    // Get the email count from localStorage or session storage
+    const emailState = JSON.parse(localStorage.getItem('emailState') || '{}');
+    const inboxEmails = emailState.inboxCount || 0;
+    return inboxEmails;
+  }
+
+  closeWhiteboard() {
+    this.whiteboardOpen = false;
+    this.whiteboardPage = 0;
+    window.dispatchEvent(new CustomEvent('closeDialogue', {}));
   }
 
   handleInteraction() {
@@ -437,7 +492,13 @@ class MainScene extends Phaser.Scene {
         detail: {} 
       }));
     }
-    // Dispatch event for ComputerScreen to handle
+    // Special handler for whiteboard - show two-page dialogue
+    else if (item.name === 'whiteboard') {
+      console.log('📋 Opening Whiteboard...');
+      this.whiteboardOpen = true;
+      this.whiteboardPage = 0;
+      this.showWhiteboardPage();
+    }
     else if (props.module) {
       console.log('📂 Opening module:', props.module);
       window.dispatchEvent(new CustomEvent('openModule', { detail: { module: props.module } }));

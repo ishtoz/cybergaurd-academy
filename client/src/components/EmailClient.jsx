@@ -28,11 +28,20 @@ const EmailClient = ({ isOpen, onClose }) => {
 
   // Update stats
   useEffect(() => {
-    setStats({
+    const newStats = {
       inbox: emails.filter(e => e.folder === 'inbox').length,
       safe: emails.filter(e => e.folder === 'safe').length,
       phishing: emails.filter(e => e.folder === 'phishing').length
-    });
+    };
+    setStats(newStats);
+    
+    // Save email state to localStorage so whiteboard can access it
+    localStorage.setItem('emailState', JSON.stringify({
+      inboxCount: newStats.inbox,
+      safeCount: newStats.safe,
+      phishingCount: newStats.phishing,
+      totalProcessed: newStats.safe + newStats.phishing
+    }));
   }, [emails]);
 
   // Disable Phaser keyboard input when modal is open to allow form input
