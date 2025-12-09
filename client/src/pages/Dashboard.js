@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCanvas from '../components/GameCanvas';
 import EmailClient from '../components/EmailClient';
+import ComputerScreen from '../components/ComputerScreen';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -43,6 +44,9 @@ function Dashboard() {
       
       {/* 📧 Email Client Modal */}
       <EmailClient isOpen={showEmailClient} onClose={() => setShowEmailClient(false)} />
+      
+      {/* 💻 Computer Screen Modal - handles whiteboard dialogues and always listens for events */}
+      <ComputerScreen isOpen={false} onClose={() => {}} />
     </div>
   );
 }

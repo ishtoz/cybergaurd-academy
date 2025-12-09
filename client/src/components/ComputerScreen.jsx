@@ -380,7 +380,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
       <div className="computer-monitor" onClick={(e) => e.stopPropagation()}>
         {/* CRT Screen Bezel */}
         <div className="screen-bezel">
-          <div className="screen-content">
+          <div className="screen-content">>
             {!isLoggedIn ? (
               // Login Screen
               <div className="login-container">
@@ -560,33 +560,33 @@ const ComputerScreen = ({ isOpen, onClose }) => {
 
         {/* Close Button */}
         <button className="screen-close" onClick={onClose} title="Close (ESC)">×</button>
+      </div>
 
-        {/* 💬 Dialogue Box at Bottom */}
-        {dialogue && (
-          <div className="dialogue-box-container">
-            <div className="dialogue-box">
-              <div className="dialogue-header">
-                <strong>{dialogue.name}</strong>
-                <button 
-                  className="dialogue-close" 
-                  onClick={() => setDialogue(null)}
-                  title="Close (ESC or X)"
-                >×</button>
-              </div>
-              <div className="dialogue-text">
-                {dialogue.text.split('\n').map((line, idx) => (
-                  <div key={idx}>{line}</div>
-                ))}
-              </div>
-              {dialogue.isWhiteboard && (
-                <div style={{ marginTop: '12px', fontSize: '12px', color: '#00d4ff', fontStyle: 'italic', textAlign: 'center' }}>
-                  Press X to close | Press Z for next page
-                </div>
-              )}
-              </div>
+      {/* 💬 Dialogue Box at Bottom */}
+      {dialogue && (
+        <div className="dialogue-box-container">
+          <div className="dialogue-box">
+            <div className="dialogue-header">
+              <strong>{dialogue.name}</strong>
+              <button 
+                className="dialogue-close" 
+                onClick={() => setDialogue(null)}
+                title="Close (ESC or X)"
+              >×</button>
             </div>
+            <div className="dialogue-text">
+              {dialogue.text.split('\n').map((line, idx) => (
+                <div key={idx}>{line}</div>
+              ))}
+            </div>
+            {dialogue.isWhiteboard && (
+              <div style={{ marginTop: '12px', fontSize: '12px', color: '#00d4ff', fontStyle: 'italic', textAlign: 'center' }}>
+                Press X to close | Press Z for next page
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
       </div>
     </div>
   );
