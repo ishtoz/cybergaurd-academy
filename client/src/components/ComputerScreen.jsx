@@ -34,7 +34,11 @@ const ComputerScreen = ({ isOpen, onClose }) => {
   const [notification, setNotification] = useState(null);
   const [showFlash, setShowFlash] = useState(false);
   const [dialogue, setDialogue] = useState(null); // 💬 Dialogue box state
+  const [displayedText, setDisplayedText] = useState(''); // Typewriter effect
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingSpeed, setTypingSpeed] = useState(60); // ms per character
   const sidebarRef = React.useRef(null);
+  const typewriterRef = React.useRef(null);
 
   // Disable Phaser keyboard input when typing in input fields
   useEffect(() => {
@@ -138,6 +142,9 @@ const ComputerScreen = ({ isOpen, onClose }) => {
       console.log('📥 Dialogue event received:', event.detail);
       const { name, text, isWhiteboard, onClose: onDialogueClose } = event.detail;
       setDialogue({ name, text, isWhiteboard: isWhiteboard || false, onClose: onDialogueClose });
+      setDisplayedText(''); // Reset typewriter
+      setIsTyping(true);
+      setTypingSpeed(60); // Reset speed
       console.log('💾 Dialogue state set to:', { name, text, isWhiteboard });
       // Auto-close after 8 seconds (unless it's whiteboard)
       if (!isWhiteboard) {
@@ -161,6 +168,47 @@ const ComputerScreen = ({ isOpen, onClose }) => {
       window.removeEventListener('closeDialogue', handleCloseDialogue);
     };
   }, []);
+
+  // 🎨 Typewriter effect
+  useEffect(() => {
+    if (!dialogue || dialogue.isWhiteboard || !isTyping) return;
+
+    const fullText = dialogue.text;
+    
+    if (displayedText.length < fullText.length) {
+      typewriterRef.current = setTimeout(() => {
+        setDisplayedText(fullText.slice(0, displayedText.length + 1));
+      }, typingSpeed);
+
+      return () => clearTimeout(typewriterRef.current);
+    } else {
+      setIsTyping(false);
+    }
+  }, [displayedText, dialogue, isTyping, typingSpeed]);
+
+  // ⚡ Handle X key to speed up dialogue (only when dialogue is visible and typing)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (dialogue && !dialogue.isWhiteboard && isTyping && (e.key === 'x' || e.key === 'X')) {
+        e.preventDefault();
+        setTypingSpeed(10); // Speed up typing
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      if (e.key === 'x' || e.key === 'X') {
+        setTypingSpeed(60); // Reset to normal speed
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [dialogue, isTyping]);
 
   const analyzeEmail = (email) => {
     setSelectedEmail(email);
@@ -649,7 +697,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
                 >×</button>
               </div>
               <div className="dialogue-text">
-                {dialogue.text.split('\n').map((line, idx) => (
+                {(displayedText || dialogue.text).split('\n').map((line, idx) => (
                   <div key={idx}>{line}</div>
                 ))}
               </div>

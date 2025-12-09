@@ -497,6 +497,21 @@ class MainScene extends Phaser.Scene {
     return inboxEmails;
   }
 
+  // Check if we've reached halfway (7 or fewer emails left)
+  isHalfwayDone() {
+    const remaining = this.getEmailCountRemaining();
+    return remaining <= 7 && remaining > 0; // More than 0 to avoid triggering on completion
+  }
+
+  // Track if we've already shown the halfway message
+  hasShownHalfwayMessage() {
+    return this.halfwayMessageShown || false;
+  }
+
+  markHalfwayMessageShown() {
+    this.halfwayMessageShown = true;
+  }
+
   closeWhiteboard() {
     this.whiteboardOpen = false;
     this.whiteboardPage = 0;
@@ -555,7 +570,20 @@ class MainScene extends Phaser.Scene {
     if (item.name === 'NPC#1 HR manager') {
       console.log('💬 Showing HR Manager dialogue...');
       
-      if (this.gameProgress === 'start') {
+      // Check if halfway done
+      if (this.isHalfwayDone() && !this.hasShownHalfwayMessage()) {
+        const halfwayMessage = `Great work! You're halfway through the emails. You've caught quite a few phishing attempts already. Keep up the good work - when you finish analyzing all the emails, come back and let me know so I can show you what to do next.`;
+        
+        window.dispatchEvent(new CustomEvent('showDialogue', { 
+          detail: { 
+            name: 'HR Manager', 
+            text: halfwayMessage,
+            onClose: () => {
+              this.markHalfwayMessageShown();
+            }
+          } 
+        }));
+      } else if (this.gameProgress === 'start') {
         // First interaction with HR - welcome message
         const welcomeMessage = `Hi ${username}! Welcome to CyberGuard Academy!\n\nYou'll be working on phishing email detection and cybersecurity awareness. It's a critical role in protecting our organization from cyber threats and keeping our employees safe from social engineering attacks.\n\nWe need sharp eyes and careful analysis to identify malicious emails before they can cause damage.`;
         
@@ -588,20 +616,36 @@ class MainScene extends Phaser.Scene {
     // Special handler for Senior Dev - unlocks more interactions
     else if (item.name === 'NPC#3 The Senior Dev') {
       console.log('💬 Showing Senior Dev dialogue...');
-      const devMessage = `Hey there! I'm David, the Senior Developer. If you need any help with the email analysis or have questions about what you're looking at, feel free to come back and ask.\n\nAlso, check out the note on the desk next to me - it has some useful tips for identifying phishing emails.`;
       
-      window.dispatchEvent(new CustomEvent('showDialogue', { 
-        detail: { 
-          name: 'Senior Dev', 
-          text: devMessage,
-          onClose: () => {
-            if (this.gameProgress === 'hr_whiteboard') {
-              console.log('🔄 Moving to senior_dev state');
-              this.gameProgress = 'senior_dev';
+      // Check if halfway done
+      if (this.isHalfwayDone() && !this.hasShownHalfwayMessage()) {
+        const halfwayMessage = `Hey, looking good! You're already halfway done with the inbox. You've got a solid eye for spotting those phishing emails. Keep grinding through the rest and once you're done, swing by and we'll figure out what's next for your training.`;
+        
+        window.dispatchEvent(new CustomEvent('showDialogue', { 
+          detail: { 
+            name: 'Senior Dev', 
+            text: halfwayMessage,
+            onClose: () => {
+              this.markHalfwayMessageShown();
             }
-          }
-        } 
-      }));
+          } 
+        }));
+      } else {
+        const devMessage = `Hey there! I'm David, the Senior Developer. If you need any help with the email analysis or have questions about what you're looking at, feel free to come back and ask.\n\nAlso, check out the note on the desk next to me - it has some useful tips for identifying phishing emails.`;
+        
+        window.dispatchEvent(new CustomEvent('showDialogue', { 
+          detail: { 
+            name: 'Senior Dev', 
+            text: devMessage,
+            onClose: () => {
+              if (this.gameProgress === 'hr_whiteboard') {
+                console.log('🔄 Moving to senior_dev state');
+                this.gameProgress = 'senior_dev';
+              }
+            }
+          } 
+        }));
+      }
     }
     // Special handler for the note - unlocks main computer
     else if (item.name === 'note') {
