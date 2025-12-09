@@ -380,7 +380,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
       <div className="computer-monitor" onClick={(e) => e.stopPropagation()}>
         {/* CRT Screen Bezel */}
         <div className="screen-bezel">
-          <div className="screen-content">>
+          <div className="screen-content">
             {!isLoggedIn ? (
               // Login Screen
               <div className="login-container">
