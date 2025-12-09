@@ -1239,3 +1239,80 @@
   font-family: 'Marker Felt', 'Comic Sans MS', cursive;
 }
 
+/* 📚 Wiki Modal Styles */
+.wiki-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.wiki-modal-container {
+  background: white;
+  width: 90%;
+  max-width: 1000px;
+  height: 80vh;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: slideUp 0.4s ease-out;
+}
+
+.wiki-modal-container > div {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.wiki-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  background: #e91e63;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 3001;
+}
+
+.wiki-modal-close:hover {
+  background: #c2185b;
+  transform: scale(1.1);
+}
+
+@media (max-width: 900px) {
+  .wiki-modal-container {
+    width: 95%;
+    height: 90vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .wiki-modal-container {
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .wiki-modal-close {
+    top: 10px;
+    right: 10px;
+  }
+}

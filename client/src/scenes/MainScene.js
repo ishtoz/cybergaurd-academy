@@ -743,17 +743,11 @@ class MainScene extends Phaser.Scene {
     }
     // Bookshelf interaction
     else if (item.name === 'Bookshelves') {
-      console.log('📚 Showing bookshelf dialogue...');
-      const bookMessage = `A collection of cybersecurity and office management books. Nothing particularly useful for your current task, but you could learn more about security protocols if you had the time.`;
-      window.dispatchEvent(new CustomEvent('showDialogue', { 
-        detail: { 
-          name: 'Bookshelves', 
-          text: bookMessage,
-          onClose: () => {
-            this.isDialogueActive = false; // 🚫 Unlock movement
-          }
-        } 
+      console.log('📚 Opening Phishing Wiki Guide...');
+      window.dispatchEvent(new CustomEvent('openPhishingWiki', { 
+        detail: {} 
       }));
+      this.isDialogueActive = true; // 🚫 Lock movement
     }
     else if (props.module) {
       console.log('📂 Opening module:', props.module);

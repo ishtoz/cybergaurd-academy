@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ComputerScreen.css';
 import { getRandomizedEmails } from '../data/emailData.js';
+import PhishingWikiGuide from './PhishingWikiGuide';
 
 const ComputerScreen = ({ isOpen, onClose }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,6 +38,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
   const [displayedText, setDisplayedText] = useState(''); // Typewriter effect
   const [isTyping, setIsTyping] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(60); // ms per character
+  const [showPhishingWiki, setShowPhishingWiki] = useState(false); // 📚 Wiki guide state
   const sidebarRef = React.useRef(null);
   const typewriterRef = React.useRef(null);
 
@@ -167,9 +169,20 @@ const ComputerScreen = ({ isOpen, onClose }) => {
     window.addEventListener('showDialogue', handleDialogueEvent);
     window.addEventListener('closeDialogue', handleCloseDialogue);
     console.log('✅ showDialogue & closeDialogue listeners registered');
+    
+    // 📚 Listen for wiki guide open event
+    const handleOpenWiki = (event) => {
+      console.log('📚 Phishing Wiki Guide opened');
+      setShowPhishingWiki(true);
+      window.dispatchEvent(new CustomEvent('dialogueOpened', { detail: { isOpen: true } }));
+    };
+    
+    window.addEventListener('openPhishingWiki', handleOpenWiki);
+    
     return () => {
       window.removeEventListener('showDialogue', handleDialogueEvent);
       window.removeEventListener('closeDialogue', handleCloseDialogue);
+      window.removeEventListener('openPhishingWiki', handleOpenWiki);
     };
   }, []);
 
@@ -709,6 +722,23 @@ const ComputerScreen = ({ isOpen, onClose }) => {
             </div>
           </div>
         )
+      )}
+
+      {/* 📚 Phishing Wiki Guide Modal */}
+      {showPhishingWiki && (
+        <div className="wiki-modal-overlay">
+          <div className="wiki-modal-container">
+            <button 
+              className="wiki-modal-close" 
+              onClick={() => {
+                setShowPhishingWiki(false);
+                window.dispatchEvent(new CustomEvent('dialogueClosed', { detail: { isOpen: false } }));
+              }}
+              title="Close (ESC)"
+            >×</button>
+            <PhishingWikiGuide />
+          </div>
+        </div>
       )}
     </>
   );
