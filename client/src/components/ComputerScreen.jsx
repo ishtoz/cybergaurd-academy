@@ -146,6 +146,8 @@ const ComputerScreen = ({ isOpen, onClose }) => {
       setIsTyping(true);
       setTypingSpeed(60); // Reset speed
       console.log('💾 Dialogue state set to:', { name, text, isWhiteboard });
+      // 🚫 Tell the scene that dialogue is now active
+      window.dispatchEvent(new CustomEvent('dialogueOpened', { detail: { isOpen: true } }));
       // Auto-close after 8 seconds (unless it's whiteboard)
       if (!isWhiteboard) {
         setTimeout(() => {
@@ -157,6 +159,8 @@ const ComputerScreen = ({ isOpen, onClose }) => {
 
     const handleCloseDialogue = () => {
       console.log('📤 Close dialogue event received');
+      // 🚫 Tell the scene that dialogue is now closed
+      window.dispatchEvent(new CustomEvent('dialogueClosed', { detail: { isOpen: false } }));
       setDialogue(null);
     };
 
@@ -684,6 +688,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
         ) : (
           // Regular dialogue box at bottom
           <div className="dialogue-box-container">
+            <div className="dialogue-speedup-hint">Press X to speed up</div>
             <div className="dialogue-box">
               <div className="dialogue-header">
                 <strong>{dialogue.name}</strong>

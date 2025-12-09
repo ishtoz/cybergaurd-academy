@@ -28,6 +28,7 @@ class MainScene extends Phaser.Scene {
     
     // 🎮 Progression system
     this.gameProgress = 'start'; // Progression states: start → hr_welcome → hr_whiteboard → senior_dev → unlocked
+    this.isDialogueActive = false; // 🚫 Lock movement during dialogue
   }
 
   preload() {
@@ -157,6 +158,17 @@ class MainScene extends Phaser.Scene {
     this.setupInteractions();
     this.drawHitboxes(); // 🎨 Draw green hitboxes after interactions are created
     this.setupControls();
+
+    // 🚫 Listen for dialogue state changes from React component
+    window.addEventListener('dialogueOpened', (event) => {
+      console.log('📂 Dialogue opened - locking movement');
+      this.isDialogueActive = true;
+    });
+
+    window.addEventListener('dialogueClosed', (event) => {
+      console.log('📂 Dialogue closed - unlocking movement');
+      this.isDialogueActive = false;
+    });
 
     // 5. Debug Graphics - HIDDEN (no visual collision display)
     const graphics = this.add.graphics().setAlpha(0.75).setDepth(200);
@@ -361,9 +373,12 @@ class MainScene extends Phaser.Scene {
         if (!this.keysPressed[e.code]) {
           this.keysPressed[e.code] = true;
         }
-        // Prevent default browser behavior for game keys
-        if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyE', 'KeyX', 'KeyZ', 'KeyR', 'KeyH', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
-          e.preventDefault();
+        // Prevent default browser behavior for game keys ONLY (not for system shortcuts like Ctrl+R, F5)
+        // Don't prevent if Ctrl, Alt, Meta, or Shift is pressed (system shortcuts)
+        if (!e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey) {
+          if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyE', 'KeyX', 'KeyZ', 'KeyR', 'KeyH', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+            e.preventDefault();
+          }
         }
       }
     });
@@ -384,8 +399,9 @@ class MainScene extends Phaser.Scene {
     const activeElement = document.activeElement;
     const isInputFocused = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');
     
-    if (isInputFocused) {
-      // Don't process game keyboard input when typing
+    // 🚫 Prevent movement during dialogue
+    if (isInputFocused || this.isDialogueActive) {
+      // Don't process game keyboard input when typing or in dialogue
       this.player.setVelocity(0, 0);
       return;
     }
@@ -466,6 +482,7 @@ class MainScene extends Phaser.Scene {
   }
 
   showWhiteboardPage() {
+    this.isDialogueActive = true; // 🚫 Lock movement
     if (this.whiteboardPage === 0) {
       // Page 1: Phishing attack warning
       const message = `⚠️  SECURITY ALERT ⚠️\n\nThe company is currently facing multiple phishing attack emails designed to compromise our security infrastructure.\n\nYour mission: Identify and filter these malicious emails to protect company data and employee accounts.\n\nBe vigilant. Stay focused.\n\n[Press X to close | Press Z for progress]`;
@@ -515,6 +532,7 @@ class MainScene extends Phaser.Scene {
   closeWhiteboard() {
     this.whiteboardOpen = false;
     this.whiteboardPage = 0;
+    this.isDialogueActive = false; // 🚫 Unlock movement
     window.dispatchEvent(new CustomEvent('closeDialogue', {}));
   }
 
@@ -527,19 +545,19 @@ class MainScene extends Phaser.Scene {
       return interactionName === 'NPC#1 HR manager';
     }
     
-    // After first HR dialogue, only HR for the whiteboard tip
+    // After first HR dialogue, HR manager stays interactable (can revisit)
     if (progress === 'hr_welcome') {
-      return interactionName === 'NPC#1 HR manager';
+      return ['NPC#1 HR manager'].includes(interactionName);
     }
     
-    // After HR gives whiteboard tip, only Senior Dev is interactable
+    // After HR gives whiteboard tip, both HR manager and Senior Dev are interactable
     if (progress === 'hr_whiteboard') {
-      return interactionName === 'NPC#3 The Senior Dev';
+      return ['NPC#1 HR manager', 'NPC#3 The Senior Dev'].includes(interactionName);
     }
     
-    // After Senior Dev, bookshelf, note, and whiteboard become interactable
+    // After Senior Dev, all NPCs and objects become interactable
     if (progress === 'senior_dev') {
-      return ['Bookshelves', 'note', 'whiteboard', 'NPC#3 The Senior Dev'].includes(interactionName);
+      return ['Bookshelves', 'note', 'whiteboard', 'NPC#1 HR manager', 'NPC#3 The Senior Dev'].includes(interactionName);
     }
     
     // After note interaction, main computer becomes interactable
@@ -580,6 +598,7 @@ class MainScene extends Phaser.Scene {
             text: halfwayMessage,
             onClose: () => {
               this.markHalfwayMessageShown();
+              this.isDialogueActive = false; // 🚫 Unlock movement
             }
           } 
         }));
@@ -594,6 +613,7 @@ class MainScene extends Phaser.Scene {
             onClose: () => {
               console.log('🔄 Moving to hr_welcome state');
               this.gameProgress = 'hr_welcome';
+              this.isDialogueActive = false; // 🚫 Unlock movement
             }
           } 
         }));
@@ -608,9 +628,39 @@ class MainScene extends Phaser.Scene {
             onClose: () => {
               console.log('🔄 Moving to hr_whiteboard state');
               this.gameProgress = 'hr_whiteboard';
+              this.isDialogueActive = false; // 🚫 Unlock movement
             }
           } 
         }));
+      } else if (this.gameProgress === 'hr_whiteboard') {
+        // Check if halfway done - if so, show halfway message and mark it as shown
+        if (this.isHalfwayDone() && !this.hasShownHalfwayMessage()) {
+          const halfwayMessage = `Great work! You're halfway through the emails. You've caught quite a few phishing attempts already. Keep up the good work - when you finish analyzing all the emails, come back and let me know so I can show you what to do next.`;
+          
+          window.dispatchEvent(new CustomEvent('showDialogue', { 
+            detail: { 
+              name: 'HR Manager', 
+              text: halfwayMessage,
+              onClose: () => {
+                this.markHalfwayMessageShown();
+                this.isDialogueActive = false; // 🚫 Unlock movement
+              }
+            } 
+          }));
+        } else {
+          // Repeat the second dialogue (whiteboard message) until halfway done
+          const whiteboardMessage = `One more thing - you can check the whiteboard at the top of the office to see your progress and any incomplete tasks. It'll help you stay organized and see what still needs to be done.\n\nGood luck!`;
+          
+          window.dispatchEvent(new CustomEvent('showDialogue', { 
+            detail: { 
+              name: 'HR Manager', 
+              text: whiteboardMessage,
+              onClose: () => {
+                this.isDialogueActive = false; // 🚫 Unlock movement
+              }
+            } 
+          }));
+        }
       }
     }
     // Special handler for Senior Dev - unlocks more interactions
@@ -627,6 +677,20 @@ class MainScene extends Phaser.Scene {
             text: halfwayMessage,
             onClose: () => {
               this.markHalfwayMessageShown();
+              this.isDialogueActive = false; // 🚫 Unlock movement
+            }
+          } 
+        }));
+      } else if (this.isHalfwayDone() && this.hasShownHalfwayMessage()) {
+        // After halfway message has been shown, give encouragement to finish
+        const finishMessage = `You're doing great! Just keep going with the rest of the emails. You're so close to finishing!`;
+        
+        window.dispatchEvent(new CustomEvent('showDialogue', { 
+          detail: { 
+            name: 'Senior Dev', 
+            text: finishMessage,
+            onClose: () => {
+              this.isDialogueActive = false; // 🚫 Unlock movement
             }
           } 
         }));
@@ -638,10 +702,7 @@ class MainScene extends Phaser.Scene {
             name: 'Senior Dev', 
             text: devMessage,
             onClose: () => {
-              if (this.gameProgress === 'hr_whiteboard') {
-                console.log('🔄 Moving to senior_dev state');
-                this.gameProgress = 'senior_dev';
-              }
+              this.isDialogueActive = false; // 🚫 Unlock movement
             }
           } 
         }));
@@ -661,6 +722,7 @@ class MainScene extends Phaser.Scene {
               console.log('🔄 Moving to unlocked state');
               this.gameProgress = 'unlocked';
             }
+            this.isDialogueActive = false; // 🚫 Unlock movement
           }
         } 
       }));
@@ -686,7 +748,10 @@ class MainScene extends Phaser.Scene {
       window.dispatchEvent(new CustomEvent('showDialogue', { 
         detail: { 
           name: 'Bookshelves', 
-          text: bookMessage
+          text: bookMessage,
+          onClose: () => {
+            this.isDialogueActive = false; // 🚫 Unlock movement
+          }
         } 
       }));
     }
