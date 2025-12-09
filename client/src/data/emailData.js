@@ -342,7 +342,7 @@ ACTION REQUIRED IMMEDIATELY:
 
 Download and install the security patch to protect your system:
 
-Download: WindowsSecurityPatch_v2.1.exe (157 MB)
+Download the security patch (157 MB)
 
 INSTALLATION INSTRUCTIONS:
 1. Download the file using the link above
@@ -360,7 +360,7 @@ IMPORTANT - DO NOT DELAY:
 
 If you do not install this update, your system may be compromised within 24 hours.
 
-Download now: WindowsSecurityPatch_v2.1.exe
+Download the security patch now
 
 This update is completely free and required for all Windows users.
 
@@ -399,7 +399,7 @@ ACTION REQUIRED:
 
 To receive your package, you must provide additional delivery information and confirm your identity. Click the link below to access your delivery options:
 
-Confirm Delivery: https://fedex.com/confirm-delivery?ref=FDX-8847392047 (but the actual link goes to https://fedex-package-trace.com/confirm-delivery)
+Confirm your delivery: https://fedex.com/confirm-delivery?ref=FDX-8847392047 (but the actual link goes to https://fedex-package-trace.com/confirm-delivery)
 
 DELIVERY OPTIONS:
 1. Schedule a new delivery attempt (Free)
@@ -409,7 +409,7 @@ DELIVERY OPTIONS:
 IMPORTANT - URGENT:
 Your package will be returned to sender in 3 days if no action is taken. Click the link above to confirm delivery before your package is shipped back.
 
-To access your delivery options and confirm your package, click here:
+To access your delivery options and confirm your package, access your delivery here:
 https://fedex.com/confirm-delivery?ref=FDX-8847392047 (actual destination: https://fedex-package-trace.com)
 
 Once you click the link, you will need to provide:
@@ -457,8 +457,6 @@ Your Amazon account access has been restricted. To restore full account access a
 Click the button below to verify your identity and unlock your account:
 
 https://amaz0n-account.com/verify-account?session=AZ94847B3C
-
-VERIFICATION REQUIRED:
 1. Amazon account email
 2. Amazon account password
 3. Full name and date of birth
@@ -470,7 +468,7 @@ VERIFICATION REQUIRED:
 URGENT - TIME SENSITIVE:
 Your account will remain suspended until verification is complete. All purchases are blocked and you cannot access your Prime membership, orders, or payment methods. If you do not verify within 24 hours, your account may be permanently closed.
 
-Account Recovery: https://amaz0n-account.com/verify-account?session=AZ94847B3C
+Verify your Amazon account: https://amaz0n-account.com/verify-account?session=AZ94847B3C
 
 We apologize for this inconvenience. Your quick action will help us protect your account and prevent fraudulent activity.
 
@@ -506,7 +504,7 @@ Your account has been temporarily locked for security purposes. To restore acces
 
 Click the secure link below to verify your account:
 
-Verify Account: http://maybank.com/account-verify (displays as maybank.com but actually links to maybank3-alert.com)
+Verify your Maybank account: http://maybank.com/account-verify (displays as maybank.com but actually links to maybank3-alert.com)
 
 IMPORTANT - WHEN YOU CLICK THE LINK:
 - You will be redirected to a secure Maybank verification page
@@ -523,7 +521,7 @@ This verification is required within 12 hours. Failure to verify will result in:
 - All pending transactions cancelled
 - Account closed due to security concerns
 
-Click here to verify: http://maybank.com/account-verify
+Verify your banking account: http://maybank.com/account-verify
 
 Thank you for protecting your account.
 
@@ -595,7 +593,7 @@ ACTION REQUIRED - URGENT:
 
 To verify your identity and reactivate your card, you must download and review our secure fraud verification document:
 
-Download Fraud Report: fraud-verification-report.zip (8.7 MB)
+Download your fraud report: fraud-verification-report.zip (8.7 MB)
 
 INSTRUCTIONS:
 1. Download the ZIP file
@@ -619,7 +617,7 @@ Download: fraud-verification-report.zip
 
 If you do not verify within 6 hours, your account will be permanently closed and all future transactions will be declined.
 
-IMMEDIATE ACTION REQUIRED: Download fraud-verification-report.zip
+Access your fraud verification: fraud-verification-report.zip
 
 Thank you,
 Citibank Fraud Protection Team
@@ -649,7 +647,7 @@ DEADLINE: December 10th, 2025 (Tomorrow)
 
 WHAT YOU NEED TO DO:
 
-1. Download the attached banking information form
+1. Download the direct deposit form
 2. Complete all required fields with your current banking details
 3. Scan your government-issued ID (front and back)
 4. Email the completed form and ID scans back to payroll@company-hrsystem.net
@@ -675,7 +673,7 @@ IMPORTANT NOTES:
 - You will receive confirmation email once processed
 - Incomplete submissions may delay your paycheck
 
-Download Form: New_Direct_Deposit_Form.pdf
+Download the direct deposit form: New_Direct_Deposit_Form.pdf
 Email completed form to: payroll@company-hrsystem.net
 
 If your payroll information is not updated by December 10th, December 15th paycheck will be delayed indefinitely. All employees must comply with this requirement.
