@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getCredentials } from '../config/credentials';
 
 // 🎛️ MASTER SWITCH: Change this to 'office' or 'server_room' to switch maps!
 const CURRENT_LEVEL = 'office'; 
@@ -26,8 +27,9 @@ class MainScene extends Phaser.Scene {
     this.whiteboardPage = 0; // 📋 Whiteboard page tracker (0=intro, 1=progress)
     this.whiteboardOpen = false; // 📋 Whiteboard is open
     
-    // 🎮 Progression system
-    this.gameProgress = 'start'; // Progression states: start → hr_welcome → hr_whiteboard → senior_dev → unlocked
+    // 🎮 Progression system - Load from localStorage or default to 'start'
+    const savedProgress = localStorage.getItem('gameProgress');
+    this.gameProgress = savedProgress || 'start'; // Progression states: start → hr_welcome → hr_whiteboard → senior_dev → unlocked
     this.isDialogueActive = false; // 🚫 Lock movement during dialogue
   }
 
@@ -168,6 +170,13 @@ class MainScene extends Phaser.Scene {
     window.addEventListener('dialogueClosed', (event) => {
       console.log('📂 Dialogue closed - unlocking movement');
       this.isDialogueActive = false;
+    });
+
+    window.addEventListener('nextWhiteboardPage', (event) => {
+      console.log('📋 Next whiteboard page event received - current page:', this.whiteboardPage);
+      this.whiteboardPage = (this.whiteboardPage + 1) % 2; // Toggle between page 0 and 1
+      console.log('📋 Whiteboard page toggled to:', this.whiteboardPage);
+      this.showWhiteboardPage();
     });
 
     // 5. Debug Graphics - HIDDEN (no visual collision display)
@@ -388,6 +397,13 @@ class MainScene extends Phaser.Scene {
     });
   }
 
+  // 💾 Save game progress to localStorage
+  saveProgress(newProgress) {
+    this.gameProgress = newProgress;
+    localStorage.setItem('gameProgress', newProgress);
+    console.log(`💾 Game progress saved: ${newProgress}`);
+  }
+
   isKeyJustPressed(code) {
     return this.keysPressed[code] && !this.keysPressedLastFrame[code];
   }
@@ -482,6 +498,7 @@ class MainScene extends Phaser.Scene {
   }
 
   showWhiteboardPage() {
+    console.log('📋 showWhiteboardPage called with page:', this.whiteboardPage);
     this.isDialogueActive = true; // 🚫 Lock movement
     if (this.whiteboardPage === 0) {
       // Page 1: Phishing attack warning
@@ -490,7 +507,8 @@ class MainScene extends Phaser.Scene {
         detail: { 
           name: 'WHITEBOARD - Page 1/2', 
           text: message,
-          isWhiteboard: true
+          isWhiteboard: true,
+          onClose: () => this.closeWhiteboard()
         } 
       }));
     } else if (this.whiteboardPage === 1) {
@@ -501,7 +519,8 @@ class MainScene extends Phaser.Scene {
         detail: { 
           name: 'WHITEBOARD - Page 2/2', 
           text: message,
-          isWhiteboard: true
+          isWhiteboard: true,
+          onClose: () => this.closeWhiteboard()
         } 
       }));
     }
@@ -534,43 +553,13 @@ class MainScene extends Phaser.Scene {
     this.whiteboardPage = 0;
     this.isDialogueActive = false; // 🚫 Unlock movement
     window.dispatchEvent(new CustomEvent('closeDialogue', {}));
+    window.dispatchEvent(new CustomEvent('dialogueClosed', {})); // Emit both events to ensure dialogue is closed
   }
 
   // 🎮 Check if an interaction is allowed based on current game progression
   isInteractionAllowed(interactionName) {
-    // Bookshelves are always interactable regardless of progression
-    if (interactionName === 'Bookshelves') {
-      return true;
-    }
-
-    const progress = this.gameProgress;
-    
-    // At the start, only HR manager is interactable
-    if (progress === 'start') {
-      return interactionName === 'NPC#1 HR manager';
-    }
-    
-    // After first HR dialogue, HR manager stays interactable (can revisit)
-    if (progress === 'hr_welcome') {
-      return ['NPC#1 HR manager'].includes(interactionName);
-    }
-    
-    // After HR gives whiteboard tip, both HR manager and Senior Dev are interactable
-    if (progress === 'hr_whiteboard') {
-      return ['NPC#1 HR manager', 'NPC#3 The Senior Dev'].includes(interactionName);
-    }
-    
-    // After Senior Dev, all NPCs and objects become interactable
-    if (progress === 'senior_dev') {
-      return ['note', 'whiteboard', 'NPC#1 HR manager', 'NPC#3 The Senior Dev'].includes(interactionName);
-    }
-    
-    // After note interaction, main computer becomes interactable
-    if (progress === 'unlocked') {
-      return true; // Everything is interactable
-    }
-    
-    return false;
+    // 🚀 DEVELOPER MODE: Allow all interactions regardless of progression
+    return true;
   }
 
   handleInteraction() {
@@ -617,7 +606,7 @@ class MainScene extends Phaser.Scene {
             text: welcomeMessage,
             onClose: () => {
               console.log('🔄 Moving to hr_welcome state');
-              this.gameProgress = 'hr_welcome';
+              this.saveProgress('hr_welcome');
               this.isDialogueActive = false; // 🚫 Unlock movement
             }
           } 
@@ -632,7 +621,7 @@ class MainScene extends Phaser.Scene {
             text: whiteboardMessage,
             onClose: () => {
               console.log('🔄 Moving to hr_whiteboard state');
-              this.gameProgress = 'hr_whiteboard';
+              this.saveProgress('hr_whiteboard');
               this.isDialogueActive = false; // 🚫 Unlock movement
             }
           } 
@@ -672,65 +661,41 @@ class MainScene extends Phaser.Scene {
     else if (item.name === 'NPC#3 The Senior Dev') {
       console.log('💬 Showing Senior Dev dialogue...');
       
-      // Check if halfway done
-      if (this.isHalfwayDone() && !this.hasShownHalfwayMessage()) {
-        const halfwayMessage = `Hey, looking good! You're already halfway done with the inbox. You've got a solid eye for spotting those phishing emails. Keep grinding through the rest and once you're done, swing by and we'll figure out what's next for your training.`;
-        
-        window.dispatchEvent(new CustomEvent('showDialogue', { 
-          detail: { 
-            name: 'Senior Dev', 
-            text: halfwayMessage,
-            onClose: () => {
-              this.markHalfwayMessageShown();
-              this.isDialogueActive = false; // 🚫 Unlock movement
-            }
-          } 
-        }));
-      } else if (this.isHalfwayDone() && this.hasShownHalfwayMessage()) {
-        // After halfway message has been shown, give encouragement to finish
-        const finishMessage = `You're doing great! Just keep going with the rest of the emails. You're so close to finishing!`;
-        
-        window.dispatchEvent(new CustomEvent('showDialogue', { 
-          detail: { 
-            name: 'Senior Dev', 
-            text: finishMessage,
-            onClose: () => {
-              this.isDialogueActive = false; // 🚫 Unlock movement
-            }
-          } 
-        }));
+      // Check if this is first interaction
+      const hasMetSeniorDev = localStorage.getItem('metSeniorDev') === 'true';
+      
+      let devMessage;
+      if (!hasMetSeniorDev) {
+        // First interaction - full introduction
+        devMessage = `Hey! I'm David, the Senior Developer. I work here on the cybersecurity team.\n\nMy email is: david.tan@company.com\n\nThe login credentials you will need to access the company's email are on the sticky note on my table.`;
+        localStorage.setItem('metSeniorDev', 'true');
       } else {
-        const devMessage = `Hey there! I'm David, the Senior Developer. If you need any help with the email analysis or have questions about what you're looking at, feel free to come back and ask.\n\nAlso, check out the note on the desk next to me - it has some useful tips for identifying phishing emails.`;
-        
-        window.dispatchEvent(new CustomEvent('showDialogue', { 
-          detail: { 
-            name: 'Senior Dev', 
-            text: devMessage,
-            onClose: () => {
-              this.isDialogueActive = false; // 🚫 Unlock movement
-            }
-          } 
-        }));
+        // Repeat interactions - just point to the sticky note and computer
+        devMessage = `Don't forget - the login credentials are on that sticky note right there. You'll need them to access the email on the main computer.`;
       }
-    }
-    // Special handler for the note - unlocks main computer
-    else if (item.name === 'note') {
-      console.log('📝 Showing note from senior dev...');
-      const noteMessage = `Tips for Identifying Phishing Emails:\n\n1. Check the sender's email address - does it look official?\n2. Look for urgent language or threats\n3. Watch for requests for personal information\n4. Be suspicious of unexpected attachments\n5. Hover over links to see the real URL\n6. Check the tone - real company emails are professional\n\nReady to analyze emails? The computer in the main area has your inbox.`;
       
       window.dispatchEvent(new CustomEvent('showDialogue', { 
         detail: { 
-          name: 'Note from Senior Dev', 
-          text: noteMessage,
+          name: 'Senior Dev - David', 
+          text: devMessage,
           onClose: () => {
-            if (this.gameProgress === 'senior_dev') {
-              console.log('🔄 Moving to unlocked state');
-              this.gameProgress = 'unlocked';
-            }
             this.isDialogueActive = false; // 🚫 Unlock movement
           }
         } 
       }));
+    }
+    // Special handler for the note - shows login credentials
+    else if (item.name === 'note') {
+      console.log('📝 Showing sticky note with credentials...');
+      const credentials = getCredentials();
+      window.dispatchEvent(new CustomEvent('showStickyNote', {
+        detail: {
+          loginEmail: credentials.email,
+          loginPassword: credentials.password,
+          devEmail: credentials.devEmail
+        }
+      }));
+      this.isDialogueActive = false;
     }
     // Special handler for main computer - open email client
     else if (item.name === 'main computer') {
@@ -744,6 +709,8 @@ class MainScene extends Phaser.Scene {
       console.log('📋 Opening Whiteboard...');
       this.whiteboardOpen = true;
       this.whiteboardPage = 0;
+      // Dispatch event to show progress button
+      window.dispatchEvent(new CustomEvent('showBoard', { detail: {} }));
       this.showWhiteboardPage();
     }
     // Bookshelf interaction

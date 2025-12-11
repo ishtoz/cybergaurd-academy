@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './EmailClient.css';
 import { SAFE_EMAILS, PHISHING_EMAILS } from '../data/emailData';
+import { getCredentials } from '../config/credentials';
 
 const EmailClient = ({ isOpen, onClose }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,6 +17,7 @@ const EmailClient = ({ isOpen, onClose }) => {
   const [feedback, setFeedback] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmails, setSelectedEmails] = useState(new Set());
+  const [linkNotification, setLinkNotification] = useState(null);
 
   // Get 6 real emails and 7 phishing (13 total as requested)
   useEffect(() => {
@@ -71,13 +73,14 @@ const EmailClient = ({ isOpen, onClose }) => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (email === 'xyz@gmail.com' && password === '123') {
+    const credentials = getCredentials();
+    if (email === credentials.email && password === credentials.password) {
       setIsLoggedIn(true);
       setLoginError('');
       setEmail('');
       setPassword('');
     } else {
-      setLoginError('Invalid credentials. Try xyz@gmail.com / 123');
+      setLoginError(`Invalid credentials. Try ${credentials.email} / ${credentials.password}`);
       setPassword('');
     }
   };
@@ -194,6 +197,12 @@ const EmailClient = ({ isOpen, onClose }) => {
   };
 
   // Function to render email content with clickable links
+  const handleLinkClick = (e, url) => {
+    e.preventDefault();
+    setLinkNotification(`Clicked on: ${url}`);
+    setTimeout(() => setLinkNotification(null), 3000); // Hide after 3 seconds
+  };
+
   const renderEmailContent = (content) => {
     // Match patterns like:
     // - "Displayed Text (actual URL)"
@@ -236,9 +245,8 @@ const EmailClient = ({ isOpen, onClose }) => {
       parts.push(
         <a
           key={`link-${lastIndex}`}
-          href={actualUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#"
+          onClick={(e) => handleLinkClick(e, actualUrl)}
           className="email-link"
           title={`Link: ${actualUrl}`}
         >
@@ -268,6 +276,11 @@ const EmailClient = ({ isOpen, onClose }) => {
   return (
     <div className="email-client-overlay" onClick={onClose}>
       <div className="email-client-window" onClick={(e) => e.stopPropagation()}>
+        {linkNotification && (
+          <div className="link-notification">
+            {linkNotification}
+          </div>
+        )}
         {!isLoggedIn ? (
           // LOGIN SCREEN
           <div className="email-login-container">

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import GameCanvas from '../components/GameCanvas';
 import EmailClient from '../components/EmailClient';
 import ComputerScreen from '../components/ComputerScreen';
+import StickyNote from '../components/StickyNote';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -47,6 +48,9 @@ function Dashboard() {
       
       {/* 💻 Computer Screen Modal - handles whiteboard dialogues and always listens for events */}
       <ComputerScreen isOpen={false} onClose={() => {}} />
+      
+      {/* 📝 Sticky Note Popup - displays login credentials */}
+      <StickyNote />
     </div>
   );
 }

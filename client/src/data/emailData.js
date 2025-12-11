@@ -95,9 +95,7 @@ Human Resources Team`,
     from: 'system@company.com',
     subject: 'Scheduled System Maintenance - December 15th',
     preview: 'Systems will be down for scheduled maintenance...',
-    fullContent: `MAINTENANCE NOTIFICATION
-
-Notification: Scheduled system maintenance will occur on the following date and time:
+    fullContent: `Notification: Scheduled system maintenance will occur on the following date and time:
 
 Date: December 15th, 2025
 Time: 2:00 AM - 4:00 AM EST
@@ -148,41 +146,41 @@ System Administration Team`,
 
 We're excited to announce that our Q4 Wellness Program is now open for enrollment! This year, we've expanded our offerings to include more fitness, mental health, and nutrition resources.
 
-Available Programs (Select One or More):
+Available programs:
 
-1. FITNESS PROGRAMS
+1. Fitness Programs
 - On-site gym membership with personal training sessions
 - Virtual fitness classes (yoga, HIIT, pilates)
 - Corporate wellness challenges with rewards
 - Access to fitness apps with company discount
 
-2. MENTAL HEALTH & WELLNESS
+2. Mental Health & Wellness
 - Confidential counseling sessions with licensed therapists
 - Stress management and meditation workshops
 - Work-life balance coaching
 - Mental health awareness seminars
 
-3. NUTRITION PROGRAMS
+3. Nutrition Programs
 - Personalized nutrition consultations
 - Healthy eating workshops
 - Subsidized healthy lunch options
 - Nutritionist-led webinars
 
-Enrollment Details:
+Enrollment details:
 - Deadline: December 1st, 2025
 - Programs start: January 1st, 2026
 - Enroll through the wellness portal at wellness.company.com
 - All full-time employees are eligible
 - Programs are free or subsidized for all staff
 
-Benefits of Enrollment:
+Benefits of enrollment:
 - Improved physical and mental health
 - Team building with colleagues
 - Company wellness discount (10-15% savings)
 - Quarterly wellness reward points
 - Certificate of completion for professional development
 
-How to Enroll:
+How to enroll:
 - Visit wellness.company.com
 - Log in with your company credentials
 - Complete the health questionnaire (optional, helps with program matching)
@@ -190,7 +188,7 @@ How to Enroll:
 - Confirm enrollment
 
 Questions?
-Contact the Wellness Team at wellness@company.com or stop by Room 302 during office hours.
+Contact the Wellness Team at wellness@company.com or call us at (555) 234-5678 during business hours.
 
 We're looking forward to supporting your health and wellness journey!
 
@@ -259,13 +257,13 @@ Human Resources Department`,
     preview: 'Network with industry leaders at our career fair...',
     fullContent: `We are thrilled to invite you to our Annual Career Fair 2025!
 
-EVENT DETAILS:
+Event details:
 Date: November 22nd, 2025
 Time: 10:00 AM - 4:00 PM EST
 Location: Convention Center, Hall B, Downtown
-Admission: FREE for all employees and industry professionals
+Admission: Free for all employees and industry professionals
 
-WHAT TO EXPECT:
+What to expect:
 - 50+ leading companies in tech, finance, healthcare, and consulting
 - One-on-one interview sessions with company recruiters
 - Networking opportunities with industry professionals
@@ -274,21 +272,23 @@ WHAT TO EXPECT:
 - Free lunch and refreshments
 - Career advancement opportunity showcase
 
-WHO SHOULD ATTEND:
+Who should attend:
 - Employees seeking internal transfers or promotions
 - Early-career professionals looking to advance
 - Anyone interested in learning about other career paths
 - Students and recent graduates
 - Career changers exploring new opportunities
 
-HOW TO SCHEDULE:
+How to schedule:
 1. Visit careers.company.com
 2. Browse participating companies
 3. Select interview times that interest you (15-minute slots)
 4. Complete your profile (name, experience, interests)
 5. Receive confirmation via email
 
-PREPARATION TIPS:
+To get started, visit our career portal at https://careers.company.com where you can register and browse all participating companies.
+
+Preparation tips:
 - Bring copies of your resume (physical and digital)
 - Research companies you plan to meet
 - Prepare questions about roles and company culture
@@ -387,32 +387,27 @@ Dear Customer,
 
 We attempted to deliver your package on December 9th, 2025, but delivery was unsuccessful. The package is currently held at our distribution center awaiting further instructions.
 
-PACKAGE DETAILS:
+Package details:
 - Tracking Number: FDX-8847392047
-- Status: DELIVERY FAILED - HELD FOR PICKUP
+- Status: Delivery failed - held for pickup
 - Recipient: You
 - Sender: Unknown
 - Weight: 2.3 kg
 - Contents: Electronics/Accessories
 
-ACTION REQUIRED:
+Action required:
 
-To receive your package, you must provide additional delivery information and confirm your identity. Click the link below to access your delivery options:
+To receive your package, you must provide additional delivery information and confirm your identity. You can confirm delivery here (http://malicious-tracker.net/fedex-confirm) to access your options.
 
-Confirm your delivery: https://fedex.com/confirm-delivery?ref=FDX-8847392047 (but the actual link goes to https://fedex-package-trace.com/confirm-delivery)
-
-DELIVERY OPTIONS:
+Delivery options:
 1. Schedule a new delivery attempt (Free)
 2. Pick up at nearest FedEx location (Free)
 3. Return to sender (Processing fee applies)
 
-IMPORTANT - URGENT:
-Your package will be returned to sender in 3 days if no action is taken. Click the link above to confirm delivery before your package is shipped back.
+Important - urgent:
+Your package will be returned to sender in 3 days if no action is taken. Update now (http://malicious-tracker.net/fedex-update) before your package is shipped back.
 
-To access your delivery options and confirm your package, access your delivery here:
-https://fedex.com/confirm-delivery?ref=FDX-8847392047 (actual destination: https://fedex-package-trace.com)
-
-Once you click the link, you will need to provide:
+Once you access the portal, you will need to provide:
 - Full name
 - Email address
 - Phone number
@@ -437,26 +432,27 @@ FedEx Global Shipping Solutions`,
     from: 'security-alert@amaz0n-account.com',
     subject: 'Your Amazon Account Has Been Compromised - Urgent Action Required',
     preview: 'Suspicious activity detected on your account...',
-    fullContent: `AMAZON ACCOUNT SECURITY ALERT
+    fullContent: `Amazon account security alert
 
 Dear Valued Amazon Customer,
 
 We have detected suspicious login attempts on your Amazon account from unauthorized locations. For your protection, we have temporarily suspended access to your account until you can verify your identity.
 
-SECURITY INCIDENT DETAILS:
+Security incident details:
 - Incident Type: Unauthorized Access Attempts
 - Detection Time: December 9, 2025 2:47 PM EST
 - Failed Login Attempts: 47
 - Locations: China, Russia, India
-- Status: Account SUSPENDED
+- Status: Account suspended
 
-IMMEDIATE ACTION REQUIRED:
+Immediate action required:
 
 Your Amazon account access has been restricted. To restore full account access and prevent fraudulent purchases, you must verify your account information immediately.
 
-Click the button below to verify your identity and unlock your account:
+To proceed, please verify here:
 
 https://amaz0n-account.com/verify-account?session=AZ94847B3C
+
 1. Amazon account email
 2. Amazon account password
 3. Full name and date of birth
@@ -465,10 +461,8 @@ https://amaz0n-account.com/verify-account?session=AZ94847B3C
 6. CVV security code
 7. Phone number
 
-URGENT - TIME SENSITIVE:
+Urgent - time sensitive:
 Your account will remain suspended until verification is complete. All purchases are blocked and you cannot access your Prime membership, orders, or payment methods. If you do not verify within 24 hours, your account may be permanently closed.
-
-Verify your Amazon account: https://amaz0n-account.com/verify-account?session=AZ94847B3C
 
 We apologize for this inconvenience. Your quick action will help us protect your account and prevent fraudulent activity.
 
@@ -486,49 +480,39 @@ security-alert@amaz0n-account.com`,
     from: 'account-security@maybank3-alert.com',
     subject: 'Urgent Banking Alert - Verify Your Account Now',
     preview: 'Unusual activity detected on your bank account...',
-    fullContent: `Maybank Account Security Notice
+    fullContent: `Maybank Account Securitate Notice - URGENTTT
 
-Dear Valued Maybank Customer,
+Dear Valued Maybank Customero,
 
-We have detected unusual transaction activity on your Maybank account. For your protection and to prevent unauthorized withdrawals, please verify your account details immediately.
+We have detektid unusual transaksion aktiviti on your Maybank konto. For your proteksyon and to prevento unauthorized withdrawlz, pleeeease verify your konto detailz immediatly now alreadee.
 
-TRANSACTION ALERT:
-- Unusual Activity: Multiple foreign transactions attempted
-- Amount: RM 15,847.50
-- Time: December 9, 2025 2:15 PM
-- Status: BLOCKED - Pending Verification
+Transaksion alert detailz informacion:
+- Unusual Aktiviti: Multiples foreign transaksion attemptid yesss
+- Amount: RM 15,847.50 rupiahh maybbe
+- Time: Desember 9, 2025 2:15 PM EST or lokol timezone
+- Statuss: Blockked - Pending Verifikashun urgentlyyy
 
-IMMEDIATE ACTION REQUIRED:
+Importent - when you klik link pleeeease do makings:
+- You will be redirekted securit Maybank verifikashun page to veryy fasttt
+- Enter your konto numbre, userneme pasword and morreeee
+- Konfirm your 6-digitt PIN kode numbre securiti safeee
+- Verifee recent the transaksionz okayy dokay
+- Uppdate sekuriti kwestions if needing or maybbe nott nott
 
-Your account has been temporarily locked for security purposes. To restore access and verify these transactions are authorized, you must complete account verification now.
+Konto has been temporerily lokked for sekuriti purposez yessss. To restore akses and verifi these transaksionz are authorizd, you must kompleet konto verifikashun nao nao nao. Your konto securiti is veeeery importent so pleease verify here to akses konto nao right now immedite.
 
-Click the secure link below to verify your account:
+This verifikashun is requiered within 12 hourz fasttt fasttt. Failur to verify will result in biggg big konsekuenses:
+- Permanente konto suspenshun maybbe maybbe
+- Blockked akses to fundz moneyz cashh
+- All pending transaksionz kanselled removvv removvv
+- Konto klozed due to sekuriti konsernn veryy badd badd
 
-Verify your Maybank account: http://maybank.com/account-verify (displays as maybank.com but actually links to maybank3-alert.com)
+Thanku for protektring your konto and sekuriti informacion yessss yessss. Immedite aksion requiered nao pleease do fasttt fasttt fasttt.
 
-IMPORTANT - WHEN YOU CLICK THE LINK:
-- You will be redirected to a secure Maybank verification page
-- Enter your account number, username, and password
-- Confirm your 6-digit PIN
-- Verify recent transactions
-- Update security questions if needed
-
-Account Verification: http://maybank.com/account-verify (NOTE: When you hover, the real URL shows a spoofed domain)
-
-This verification is required within 12 hours. Failure to verify will result in:
-- Permanent account suspension
-- Blocked access to funds
-- All pending transactions cancelled
-- Account closed due to security concerns
-
-Verify your banking account: http://maybank.com/account-verify
-
-Thank you for protecting your account.
-
-Maybank Security Team
+Maybank Sekuriti Teemm
 account-security@maybank3-alert.com
 
-Maybank Berhad - Malaysia Financial Services`,
+Maybank Berhhad - Malayzia Finansial Servises`,
     isPhishing: true,
     folder: 'inbox',
     read: false,
@@ -634,54 +618,54 @@ fraud-detection@citibank-secure.net`,
   },
   {
     id: 13,
-    from: 'payroll@company-hrsystem.net',
+    from: 'payroll@company-hrsystem.kp',
     subject: 'Critical Payroll System Update - New Direct Deposit Form Required',
     preview: 'All employees must submit updated banking information...',
-    fullContent: `PAYROLL SYSTEM NOTIFICATION
+    fullContent: `Payroll System Notification - Urgent Update
 
-Important Update for All Employees:
+Hello Employee,
 
-Due to a system security upgrade, all employees must resubmit their direct deposit and banking information through our new secure payroll portal. This ensures uninterrupted payment processing for your December and January paychecks.
+Due security upgrade of system, all employees must resubmit deposit information for banking through new secure payroll portal. This ensure uninterrupted payment for December and January pay check.
 
-DEADLINE: December 10th, 2025 (Tomorrow)
+Deadline: December 10th, 2025 (Tomorrow - very important!)
 
-WHAT YOU NEED TO DO:
+What you must to do:
 
-1. Download the direct deposit form
-2. Complete all required fields with your current banking details
-3. Scan your government-issued ID (front and back)
-4. Email the completed form and ID scans back to payroll@company-hrsystem.net
+1. Download the form for direct deposit
+2. Complete all field with your current banking details
+3. Scan your ID government-issued (front and back side)
+4. Email the form and ID scan back to payroll@company-hrsystem.kp
 
-REQUIRED INFORMATION:
-- Full legal name and date of birth
+Required information needed:
+- Full legal name and date birth
 - Social Security Number (SSN)
-- Bank name and branch location
-- Full bank account number
-- Bank routing number (9-digit code)
-- Account type (Checking/Savings)
-- Account holder phone number
+- Bank name and location branch
+- Full number account bank
+- Bank routing number (9 digit code)
+- Account type (Checking or Savings)
+- Phone number of account holder
 
-DOCUMENT REQUIREMENTS:
-- Government-issued photo ID (driver's license or passport)
-- Recent bank statement showing account number
-- Social Security card or tax document with SSN
+Document requirement:
+- Photo ID government-issued (driver license or passport)
+- Bank statement recent showing account number
+- Card Social Security or document tax with SSN
 
-IMPORTANT NOTES:
-- This form is 100% secure and encrypted
-- Your information is protected by company data security policies
-- Processing takes 24-48 hours
-- You will receive confirmation email once processed
-- Incomplete submissions may delay your paycheck
+Important note:
+- Form is 100% secure and encrypted very much
+- Your information is protection by company data security
+- Processing take 24-48 hour
+- You will receive confirmation email when is processed
+- Incomplete submission may delay your paycheck
 
-Download the direct deposit form: New_Direct_Deposit_Form.pdf
-Email completed form to: payroll@company-hrsystem.net
+Download form direct deposit here: New_Direct_Deposit_Form.pdf
+Email completed form to: payroll@company-hrsystem.kp
 
-If your payroll information is not updated by December 10th, December 15th paycheck will be delayed indefinitely. All employees must comply with this requirement.
+If your payroll information not updated by December 10th, your December 15th paycheck will be delayed very long time. All employee must comply with this require.
 
 Questions? Contact Payroll Department
-payroll@company-hrsystem.net
+payroll@company-hrsystem.kp
 
-Human Resources - Payroll Services`,
+Human Resources - Payroll Service`,
     isPhishing: true,
     folder: 'inbox',
     read: false,
@@ -689,8 +673,8 @@ Human Resources - Payroll Services`,
     attachments: [
       { name: 'New_Direct_Deposit_Form.pdf', size: '2.4 MB', type: 'document' }
     ],
-    feedbackCorrect: 'Correct! This is phishing. Red flags: Non-company domain (company-hrsystem.net instead of company.com), requests complete banking information (account number, routing number, SSN), asks for scans of ID and Social Security card via email (identity theft vector), creates urgency with deadline and threat of delayed paycheck, requests information that internal payroll systems already have, legitimate HR departments never ask for SSN or complete account details via unsolicited email.',
-    feedbackIncorrect: 'This is phishing collecting personal and financial information for identity theft. The non-official domain and requests for SSN, bank account details, and ID scans are major red flags. Internal HR departments already have this information - they would never ask you to resubmit via email. The paycheck delay threat is artificial pressure. Legitimate payroll changes use secure internal portals or direct communication from known HR staff.'
+    feedbackCorrect: 'Correct! This is phishing. Red flags: Non-company domain (company-hrsystem.kp instead of company.com), requests complete banking information (account number, routing number, SSN), asks for scans of ID and Social Security card via email (identity theft vector), broken English and poor grammar suggesting non-native speaker or compromised account, creates urgency with deadline and threat of delayed paycheck, requests information that internal payroll systems already have, legitimate HR departments never ask for SSN or complete account details via unsolicited email.',
+    feedbackIncorrect: 'This is phishing collecting personal and financial information for identity theft. The non-official domain (.kp) and requests for SSN, bank account details, and ID scans are major red flags. The broken English and poor grammar are additional indicators of a scam. Internal HR departments already have this information - they would never ask you to resubmit via email. The paycheck delay threat is artificial pressure. Legitimate payroll changes use secure internal portals or direct communication from known HR staff.'
   }
 ];
 

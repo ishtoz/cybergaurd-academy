@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ComputerScreen.css';
 import { getRandomizedEmails } from '../data/emailData.js';
+import { getCredentials } from '../config/credentials.js';
 import PhishingWikiGuide from './PhishingWikiGuide';
 
 const ComputerScreen = ({ isOpen, onClose }) => {
@@ -9,10 +10,8 @@ const ComputerScreen = ({ isOpen, onClose }) => {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  const correctCredentials = {
-    email: 'intern@cyberguard.edu',
-    password: 'PhishingAlert@2025!'
-  };
+  // Use credentials from config
+  const correctCredentials = getCredentials();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -147,7 +146,10 @@ const ComputerScreen = ({ isOpen, onClose }) => {
       setDisplayedText(''); // Reset typewriter
       setIsTyping(true);
       setTypingSpeed(60); // Reset speed
-      console.log('💾 Dialogue state set to:', { name, text, isWhiteboard });
+      console.log('💾 Dialogue state set to:', { name, isWhiteboard, textLength: text.length });
+      if (isWhiteboard) {
+        console.log('🔄 Whiteboard dialogue updated - Page:', name);
+      }
       // 🚫 Tell the scene that dialogue is now active
       window.dispatchEvent(new CustomEvent('dialogueOpened', { detail: { isOpen: true } }));
       // Auto-close after 8 seconds (unless it's whiteboard)
@@ -227,6 +229,28 @@ const ComputerScreen = ({ isOpen, onClose }) => {
     };
   }, [dialogue, isTyping]);
 
+  // 📊 Track email changes and dispatch count updates
+  useEffect(() => {
+    if (isLoggedIn) {
+      const remainingCount = emails.filter(e => e.folder === 'inbox' || e.folder === 'starred').length;
+      console.log('📧 Email count updated:', remainingCount);
+      
+      // Update localStorage so MainScene can access the email count
+      localStorage.setItem('emailState', JSON.stringify({
+        inboxCount: remainingCount
+      }));
+      
+      // Dispatch event to StickyNote component
+      window.dispatchEvent(new CustomEvent('emailCountUpdated', { 
+        detail: { 
+          inbox: remainingCount, 
+          processed: 13 - remainingCount,
+          total: 13
+        } 
+      }));
+    }
+  }, [emails, isLoggedIn]);
+
   const analyzeEmail = (email) => {
     setSelectedEmail(email);
     setAnalyzed(true);
@@ -271,9 +295,9 @@ const ComputerScreen = ({ isOpen, onClose }) => {
     const remainingCount = updatedEmails.filter(e => e.folder === 'inbox' || e.folder === 'starred').length;
     window.dispatchEvent(new CustomEvent('emailCountUpdated', { 
       detail: { 
-        remaining: remainingCount, 
-        processed: 16 - remainingCount,
-        total: 16
+        inbox: remainingCount, 
+        processed: 13 - remainingCount,
+        total: 13
       } 
     }));
     
@@ -315,9 +339,9 @@ const ComputerScreen = ({ isOpen, onClose }) => {
     const remainingCount = updatedEmails.filter(e => e.folder === 'inbox' || e.folder === 'starred').length;
     window.dispatchEvent(new CustomEvent('emailCountUpdated', { 
       detail: { 
-        remaining: remainingCount, 
-        processed: 16 - remainingCount,
-        total: 16
+        inbox: remainingCount, 
+        processed: 13 - remainingCount,
+        total: 13
       } 
     }));
     
@@ -459,26 +483,48 @@ const ComputerScreen = ({ isOpen, onClose }) => {
 
 
   useEffect(() => {
-    if (!isOpen) {
-      setSelectedEmail(null);
-      setAnalyzed(false);
+    console.log('⌨️ Keyboard effect running - Dialogue:', dialogue?.name);
+    
+    // Only set up keyboard handlers if dialogue is visible
+    if (!dialogue) {
+      console.log('⌨️ No dialogue active, skipping keyboard setup');
       return;
     }
 
     const handleKeyDown = (e) => {
+      console.log('⌨️ Keydown event:', e.code, 'Target:', e.target.tagName, 'Dialogue:', dialogue?.name);
+      
       // Don't interfere with form inputs
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        console.log('⌨️ Skipping key - input/textarea focused');
         return;
       }
 
       if (e.code === 'Escape') {
         onClose();
       }
+
+      // Whiteboard keyboard controls
+      if (dialogue && dialogue.isWhiteboard) {
+        console.log('⌨️ Whiteboard is active');
+        if (e.code === 'KeyX') {
+          e.preventDefault();
+          console.log('🔑 X key pressed - closing whiteboard');
+          if (dialogue.onClose) dialogue.onClose();
+          setDialogue(null);
+        }
+        if (e.code === 'KeyZ') {
+          e.preventDefault();
+          console.log('🔑 Z key pressed on whiteboard, dispatching nextWhiteboardPage event');
+          // Dispatch event to MainScene for next page
+          window.dispatchEvent(new CustomEvent('nextWhiteboardPage'));
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [dialogue]);
 
   return (
     <>
