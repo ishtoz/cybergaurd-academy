@@ -10,6 +10,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
+// Production deployment active
+
 // Placeholder component for module pages
 function ModulePage() {
   const { moduleType } = useParams();
