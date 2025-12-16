@@ -77,6 +77,9 @@ function Login() {
         <p className="auth-link">
           Don't have an account? <Link to="/register">Register here</Link>
         </p>
+        <button onClick={() => navigate('/')} className="back-button" style={{marginTop: '15px', width: '100%', padding: '10px', backgroundColor: '#555', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
+          Back to Main Menu
+        </button>
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { register } from '../services/api';
 import './Register.css';
 
 function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -16,6 +17,8 @@ function Register() {
   const [success, setSuccess] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [captchaToken, setCaptchaToken] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const recaptchaRef = useRef();
 
   const handleChange = (e) => {
@@ -25,6 +28,25 @@ function Register() {
     });
     setError('');
   };
+
+  const validatePassword = (pwd) => {
+    const hasUpperCase = /[A-Z]/.test(pwd);
+    const hasLowerCase = /[a-z]/.test(pwd);
+    const hasNumbers = /\d/.test(pwd);
+    const hasSpecialChar = /[@$!%*?&]/.test(pwd);
+    const isLongEnough = pwd.length >= 8;
+
+    return {
+      hasUpperCase,
+      hasLowerCase,
+      hasNumbers,
+      hasSpecialChar,
+      isLongEnough,
+      isValid: hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar && isLongEnough
+    };
+  };
+
+  const passwordStrength = validatePassword(formData.password);
 
   const handleCaptchaChange = (token) => {
     setCaptchaToken(token);
@@ -47,8 +69,8 @@ function Register() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    if (!passwordStrength.isValid) {
+      setError('Password does not meet requirements');
       return;
     }
 
@@ -62,11 +84,12 @@ function Register() {
         captchaToken
       );
       
-      // Registration successful - show email verification instructions
+      // Registration successful - redirect to 2FA setup (email auto-verified)
       if (response.success && response.user) {
-        setSuccess(true);
-        setUserEmail(response.user.email || formData.email);
-        setError('');
+        // Store user info and token for 2FA setup
+        localStorage.setItem('user', JSON.stringify(response.user));
+        localStorage.setItem('token', response.token);
+        navigate('/setup-2fa');
       }
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
@@ -131,38 +154,79 @@ function Register() {
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="Enter your password (min 6 characters)"
-              minLength={6}
-            />
+            <div className="password-input-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter your password"
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+            {formData.password && (
+              <div className="password-requirements">
+                <p className="requirements-title">Password must contain:</p>
+                <div className={`requirement ${passwordStrength.isLongEnough ? 'met' : ''}`}>
+                  ✓ At least 8 characters
+                </div>
+                <div className={`requirement ${passwordStrength.hasUpperCase ? 'met' : ''}`}>
+                  ✓ One uppercase letter (A-Z)
+                </div>
+                <div className={`requirement ${passwordStrength.hasLowerCase ? 'met' : ''}`}>
+                  ✓ One lowercase letter (a-z)
+                </div>
+                <div className={`requirement ${passwordStrength.hasNumbers ? 'met' : ''}`}>
+                  ✓ One number (0-9)
+                </div>
+                <div className={`requirement ${passwordStrength.hasSpecialChar ? 'met' : ''}`}>
+                  ✓ One special character (@$!%*?&)
+                </div>
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              placeholder="Confirm your password"
-              minLength={6}
-            />
+            <div className="password-input-wrapper">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                placeholder="Confirm your password"
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
           </div>
           
           <div className="form-group captcha-group">
             <ReCAPTCHA
               ref={recaptchaRef}
-              sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+              sitekey="6LfwRC0sAAAAAI4uY5mHJ699kTPFnNeZVrNz9sbh"
               onChange={handleCaptchaChange}
               theme="dark"
             />
+            <small style={{marginTop: '10px', color: '#999', fontSize: '11px'}}>
+              This site is protected by reCAPTCHA and the Google
+              <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{color: '#999', marginLeft: '3px'}}>Privacy Policy</a> and
+              <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style={{color: '#999', marginLeft: '3px'}}>Terms of Service</a> apply.
+            </small>
           </div>
 
           <button 
@@ -176,6 +240,9 @@ function Register() {
             <p className="auth-link">
               Already have an account? <Link to="/login">Login here</Link>
             </p>
+            <button onClick={() => navigate('/')} className="back-button" style={{marginTop: '15px', width: '100%', padding: '10px', backgroundColor: '#555', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
+              Back to Main Menu
+            </button>
           </>
         )}
       </div>

@@ -36,6 +36,42 @@ router.post('/register', async (req, res) => {
     console.log('Username:', username);
     console.log('Email:', email);
 
+    // Verify CAPTCHA token with Google
+    if (captchaToken) {
+      try {
+        const captchaResponse = await axios.post(
+          `https://www.google.com/recaptcha/api/siteverify`,
+          null,
+          {
+            params: {
+              secret: process.env.RECAPTCHA_SECRET_KEY,
+              response: captchaToken
+            }
+          }
+        );
+
+        console.log('CAPTCHA verification response:', captchaResponse.data);
+
+        if (!captchaResponse.data.success || captchaResponse.data.score < 0.5) {
+          return res.status(400).json({
+            success: false,
+            message: 'CAPTCHA verification failed. Please try again.'
+          });
+        }
+      } catch (captchaError) {
+        console.error('CAPTCHA verification error:', captchaError);
+        return res.status(400).json({
+          success: false,
+          message: 'Failed to verify CAPTCHA. Please try again.'
+        });
+      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'CAPTCHA verification is required'
+      });
+    }
+
     // Basic validation
     if (!username || !email || !password) {
       return res.status(400).json({ 
@@ -47,11 +83,8 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    // Insert into database - email not verified yet
+    // For development: Auto-verify email on signup (skip email verification)
+    // Insert into database - email AUTO-VERIFIED
     const insertQuery = `
       INSERT INTO users (username, email, password_hash, email_verified, verification_token, token_expiry, created_at)
       VALUES ($1, $2, $3, $4, $5, $6, NOW())
@@ -62,28 +95,28 @@ router.post('/register', async (req, res) => {
       username, 
       email, 
       hashedPassword, 
-      false,  // email_verified = false
-      verificationToken,
-      tokenExpiry
+      true,  // email_verified = TRUE (auto-verified)
+      null,  // no verification token needed
+      null   // no token expiry needed
     ]);
     
     const user = result.rows[0];
     console.log('User created successfully:', user.id);
-
-    // Send verification email
-    try {
-      await sendVerificationEmail(email, verificationToken, username);
-      console.log('Verification email sent to:', email);
-    } catch (emailError) {
-      console.error('Error sending verification email:', emailError);
-      // Don't fail registration if email fails, but log it
-    }
+    console.log('✅ Email auto-verified on signup (development mode)');
 
     console.log('=== Registration Successful ===');
 
+    // Auto-login after registration (email is auto-verified)
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
     return res.status(201).json({
       success: true,
-      message: 'Registration successful. Please check your email to verify your account.',
+      message: 'Registration successful. Please set up 2FA.',
+      token: token,
       user: {
         id: user.id,
         username: user.username,
@@ -222,6 +255,26 @@ router.post('/login', authLimiter, loginValidator, async (req, res, next) => {
     if (!email || !password) {
       return res.status(400).json({ 
         error: 'Email and password are required' 
+      });
+    }
+
+    // TEST USER - For immediate testing without database
+    if (email === 'alex@test.com' && password === '123@123@') {
+      console.log('✅ TEST USER LOGIN: alex@test.com');
+      const token = jwt.sign(
+        { userId: 999, email: 'alex@test.com' },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      return res.json({
+        message: 'Login successful',
+        token,
+        user: {
+          id: 999,
+          username: 'alex',
+          email: 'alex@test.com'
+        }
       });
     }
 

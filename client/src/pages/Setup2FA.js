@@ -23,19 +23,28 @@ function Setup2FA() {
   const generateQRCode = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('token');
+      console.log('📱 Generating QR Code...');
+      console.log('Token exists:', !!token);
+      console.log('Token:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
+      
       const response = await fetch('http://localhost:5000/api/auth/setup-2fa', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
+      
       if (data.qrCode && data.secret) {
         setQrCode(data.qrCode);
         setSecret(data.secret);
       }
     } catch (err) {
+      console.error('QR generation error:', err);
       setError('Failed to generate QR code');
     } finally {
       setLoading(false);
@@ -79,12 +88,12 @@ function Setup2FA() {
     const element = document.createElement('a');
     const file = new Blob(
       [
-        `CyberGuard Academy - 2FA Backup Codes\nGenerated: ${new Date().toLocaleString()}\n\n${backupCodes.join('\n')}\n\n⚠️  KEEP THESE SAFE. DO NOT SHARE WITH ANYONE.`,
+        `CyberGuard Academy - 2FA Backup Codes\nUsername: ${user.username}\nGenerated: ${new Date().toLocaleString()}\n\n${backupCodes.join('\n')}\n\nKEEP THESE SAFE. DO NOT SHARE WITH ANYONE.`,
       ],
       { type: 'text/plain' }
     );
     element.href = URL.createObjectURL(file);
-    element.download = `backup-codes-${Date.now()}.txt`;
+    element.download = `${user.username}-backup-codes.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -152,7 +161,7 @@ function Setup2FA() {
               <>
                 <div className="qrcode-container">
                   <img 
-                    src={`data:image/png;base64,${qrCode}`} 
+                    src={qrCode} 
                     alt="QR Code" 
                     className="qrcode-image"
                   />

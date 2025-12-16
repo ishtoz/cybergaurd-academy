@@ -9,6 +9,10 @@ const nodemailer = require('nodemailer');
  */
 const sendVerificationEmail = async (email, verificationToken, username) => {
   try {
+    console.log('📧 Attempting to send verification email...');
+    console.log('Email user:', process.env.EMAIL_USER);
+    console.log('Email password set:', !!process.env.EMAIL_PASSWORD);
+    
     // Create transporter using Gmail
     const transporter = nodemailer.createTransport({
       service: 'gmail',

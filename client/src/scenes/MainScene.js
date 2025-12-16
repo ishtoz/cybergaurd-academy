@@ -62,6 +62,24 @@ class MainScene extends Phaser.Scene {
 
     this.load.image('player', '/assets/sprites/player.png');
     this.load.image('npc', '/assets/sprites/npc.png');
+    
+    // Load spritesheet for Player character (32x32, 4 frames for directions)
+    this.load.spritesheet('player_character', '/assets/sprites/player_character.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    
+    // Load spritesheet for HR NPC (32x32 character)
+    this.load.spritesheet('hr_character', '/assets/sprites/hr_character.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    
+    // Load spritesheet for Senior Dev NPC (32x32 character)
+    this.load.spritesheet('senior_dev_character', '/assets/sprites/senior_dev_character.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
   }
 
   create() {
@@ -191,6 +209,111 @@ class MainScene extends Phaser.Scene {
   }
 
   createPlayerAndCamera() {
+    // Create animations for Player character
+    // Layout: [column (y), row (x)] where column 0-7, rows 0-6+
+    // Standing still: [0, 0] = frame 0
+    if (!this.anims.exists('player_idle')) {
+      this.anims.create({
+        key: 'player_idle',
+        frames: [{ key: 'player_character', frame: 0 }],
+        frameRate: 1,
+        repeat: -1
+      });
+    }
+    
+    // Walking right: test Row 2 frames 16-21
+    if (!this.anims.exists('player_walk_right')) {
+      this.anims.create({
+        key: 'player_walk_right',
+        frames: [
+          { key: 'player_character', frame: 18 },
+          { key: 'player_character', frame: 19 },
+          { key: 'player_character', frame: 20 },
+          { key: 'player_character', frame: 21 }
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+    }
+    
+    // Walking up: [frames 32-35]
+    if (!this.anims.exists('player_walk_up')) {
+      this.anims.create({
+        key: 'player_walk_up',
+        frames: [
+          { key: 'player_character', frame: 32 },
+          { key: 'player_character', frame: 33 },
+          { key: 'player_character', frame: 34 },
+          { key: 'player_character', frame: 35 }
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+    }
+    
+    // Walking left: same frames as right, but will be flipped
+    if (!this.anims.exists('player_walk_left')) {
+      this.anims.create({
+        key: 'player_walk_left',
+        frames: [
+          { key: 'player_character', frame: 18 },
+          { key: 'player_character', frame: 19 },
+          { key: 'player_character', frame: 20 },
+          { key: 'player_character', frame: 21 }
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+    }
+    // Walking down: use these 6 frames
+    if (!this.anims.exists('player_walk_down')) {
+      this.anims.create({
+        key: 'player_walk_down',
+        frames: [
+          { key: 'player_character', frame: 8 },
+          { key: 'player_character', frame: 9 },
+          { key: 'player_character', frame: 10 },
+          { key: 'player_character', frame: 11 },
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+    }
+    // Walking up: use Row 4 frames 32-35
+    if (!this.anims.exists('player_walk_up')) {
+      this.anims.create({
+        key: 'player_walk_up',
+        frames: [
+          { key: 'player_character', frame: 32 },
+          { key: 'player_character', frame: 33 },
+          { key: 'player_character', frame: 34 },
+          { key: 'player_character', frame: 35 }
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+    }
+
+    // Create animation for HR NPC - show only the first frame (top-left)
+    if (!this.anims.exists('hr_character_idle')) {
+      this.anims.create({
+        key: 'hr_character_idle',
+        frames: [{ key: 'hr_character', frame: 0 }], // Frame 0 is top-left
+        frameRate: 1,
+        repeat: -1
+      });
+    }
+
+    // Create animation for Senior Dev NPC - show only the first frame (top-left)
+    if (!this.anims.exists('senior_dev_character_idle')) {
+      this.anims.create({
+        key: 'senior_dev_character_idle',
+        frames: [{ key: 'senior_dev_character', frame: 0 }], // Frame 0 is top-left
+        frameRate: 1,
+        repeat: -1
+      });
+    }
+
     if (!this.textures.exists('player')) {
         const g = this.add.graphics();
         g.fillStyle(0xff9900, 1);
@@ -203,12 +326,15 @@ class MainScene extends Phaser.Scene {
     const startX = 100; 
     const startY = 300;
 
-    this.player = this.physics.add.sprite(startX, startY, 'player');
+    this.player = this.physics.add.sprite(startX, startY, 'player_character');
     this.player.setDepth(10);
     this.player.setCollideWorldBounds(true);
-    this.player.setScale(0.5);
+    this.player.setScale(2.5); // 32x32 scaled to ~48px
     this.player.body.setDrag(0.99); // Add friction
     this.player.body.setMaxSpeed(300); // Cap speed
+    
+    // Play idle animation
+    this.player.play('player_idle');
     
     const width = this.player.width;
     const height = this.player.height;
@@ -287,6 +413,11 @@ class MainScene extends Phaser.Scene {
           
           this.interactions.push(interactionData);
           
+          // Create visible sprite for NPCs
+          if (layerName.toLowerCase().includes('npc')) {
+            this.createSmartNPC(zoneX, zoneY, layerName, interactionData);
+          }
+          
           console.log(`✓ ${layerName} at (${zoneX.toFixed(1)}, ${zoneY.toFixed(1)}) - Size: ${obj.width.toFixed(1)}x${obj.height.toFixed(1)}`);
         });
       } else {
@@ -351,6 +482,23 @@ class MainScene extends Phaser.Scene {
   }
 
   createSmartNPC(x, y, name, data) {
+    // Use specific character sprites for NPCs
+    let spriteKey = 'npc';
+    let useAnimation = false;
+    let animationKey = '';
+    
+    if (name && name.toLowerCase().includes('hr')) {
+      spriteKey = 'hr_character';
+      animationKey = 'hr_character_idle';
+      useAnimation = true;
+      console.log('🎨 Creating HR NPC with character sprite at', x, y);
+    } else if (name && name.toLowerCase().includes('senior dev')) {
+      spriteKey = 'senior_dev_character';
+      animationKey = 'senior_dev_character_idle';
+      useAnimation = true;
+      console.log('🎨 Creating Senior Dev NPC with character sprite at', x, y);
+    }
+    
     if (!this.textures.exists('npc')) {
         const g = this.add.graphics();
         g.fillStyle(0x0000ff, 1);
@@ -358,9 +506,34 @@ class MainScene extends Phaser.Scene {
         g.generateTexture('npc', 16, 16);
         g.destroy();
     }
-    const npcSprite = this.physics.add.sprite(x, y, 'npc');
-    npcSprite.setDepth(6).setImmovable(true).setScale(0.5);
+    
+    // Debug: Check if sprite texture exists
+    if (!this.textures.exists(spriteKey)) {
+      console.error('❌ Texture missing:', spriteKey);
+      console.log('Available textures:', this.textures.getTextureKeys());
+      spriteKey = 'npc'; // Fallback to blue box
+    } else {
+      console.log('✅ Texture loaded:', spriteKey);
+      const texture = this.textures.get(spriteKey);
+      console.log('Texture frames:', texture.getFrameNames());
+    }
+    
+    const npcSprite = this.physics.add.sprite(x, y, spriteKey);
+    npcSprite.setDepth(6).setImmovable(true).setScale(useAnimation ? 2.5 : 1);
+    
+    // Play animation if using character sprites
+    if (useAnimation && spriteKey !== 'npc') {
+      if (this.anims.exists(animationKey)) {
+        npcSprite.play(animationKey);
+        console.log('▶️ Playing', animationKey, 'animation');
+      } else {
+        console.error('❌ Animation not found:', animationKey);
+        console.log('Available animations:', this.anims.getKeys());
+      }
+    }
+    
     const nW = npcSprite.width; const nH = npcSprite.height;
+    console.log('NPC sprite dimensions:', nW, 'x', nH);
     npcSprite.body.setSize(nW * 0.4, nH * 0.2);
     npcSprite.body.setOffset((nW - nW * 0.4) / 2, nH - nH * 0.2);
     this.physics.add.collider(this.player, npcSprite);
@@ -439,6 +612,29 @@ class MainScene extends Phaser.Scene {
     
     if (vx !== 0 && vy !== 0) { vx *= 0.7071; vy *= 0.7071; }
     this.player.setVelocity(vx, vy);
+    
+    // Play animations based on movement
+    if (Math.abs(vx) > 0 || Math.abs(vy) > 0) {
+      // Moving - play walking animations
+      if (Math.abs(vx) > Math.abs(vy)) {
+        // Horizontal movement
+        if (vx > 0) {
+          this.player.play('player_walk_right', true);
+        } else {
+          this.player.play('player_walk_left', true);
+        }
+      } else if (Math.abs(vy) > 0) {
+        // Vertical movement
+        if (vy > 0) {
+          this.player.play('player_walk_down', true);
+        } else {
+          this.player.play('player_walk_up', true);
+        }
+      }
+    } else {
+      // Not moving - play idle animation
+      this.player.play('player_idle', true);
+    }
 
     // 🎯 Update character hitbox position to follow player
     if (this.playerHitbox) {
