@@ -23,18 +23,47 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    console.log('[LOGIN] Form submission');
+
+    // Input validation
+    if (!formData.email || !formData.password) {
+      const errorMsg = 'Email and password are required';
+      console.warn(`[LOGIN] Validation failed: ${errorMsg}`);
+      setError(errorMsg);
+      return;
+    }
+
+    // Email format validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      const errorMsg = 'Invalid email format';
+      console.warn(`[LOGIN] Invalid email: ${formData.email}`);
+      setError(errorMsg);
+      return;
+    }
+
+    console.log(`[LOGIN] Validation passed for email: ${formData.email}`);
     setLoading(true);
 
     try {
+      console.log('[LOGIN] Sending login request to server...');
       const response = await login(formData.email, formData.password);
       
       if (response.token) {
+        console.log('[LOGIN] ✅ Login successful, redirecting to 2FA/Dashboard');
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
+        // Navigate to 2FA if needed, otherwise dashboard
         navigate('/dashboard');
+      } else {
+        const errorMsg = response.message || 'Login failed. Please try again.';
+        console.error(`[LOGIN] No token received: ${errorMsg}`);
+        setError(errorMsg);
       }
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      const errorMsg = err.message || 'Login failed. Please try again.';
+      console.error(`[LOGIN] ❌ Error: ${errorMsg}`);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

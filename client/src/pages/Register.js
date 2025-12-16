@@ -57,26 +57,64 @@ function Register() {
     e.preventDefault();
     setError('');
 
+    console.log('[REGISTER] Form submission - validating inputs');
+
+    // Input validation
+    if (!formData.username || !formData.email || !formData.password) {
+      const errorMsg = 'All fields are required';
+      console.warn(`[REGISTER] Validation failed: ${errorMsg}`);
+      setError(errorMsg);
+      return;
+    }
+
+    // Username validation (3-20 chars, alphanumeric + underscore/hyphen)
+    if (formData.username.length < 3 || formData.username.length > 20) {
+      const errorMsg = 'Username must be 3-20 characters';
+      console.warn(`[REGISTER] Username length invalid: ${formData.username.length}`);
+      setError(errorMsg);
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(formData.username)) {
+      const errorMsg = 'Username can only contain letters, numbers, underscores, and hyphens';
+      console.warn(`[REGISTER] Invalid username format`);
+      setError(errorMsg);
+      return;
+    }
+
+    // Email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      const errorMsg = 'Invalid email format';
+      console.warn(`[REGISTER] Invalid email format: ${formData.email}`);
+      setError(errorMsg);
+      return;
+    }
+
     // CAPTCHA validation
     if (!captchaToken) {
+      console.warn('[REGISTER] CAPTCHA not completed');
       setError('Please complete the CAPTCHA verification');
       return;
     }
 
     // Password validation
     if (formData.password !== formData.confirmPassword) {
+      console.warn('[REGISTER] Passwords do not match');
       setError('Passwords do not match');
       return;
     }
 
     if (!passwordStrength.isValid) {
+      console.warn('[REGISTER] Password strength insufficient');
       setError('Password does not meet requirements');
       return;
     }
 
+    console.log(`[REGISTER] All validations passed for user: ${formData.username}`);
     setLoading(true);
 
     try {
+      console.log('[REGISTER] Sending registration request to server...');
       const response = await register(
         formData.username,
         formData.email,
@@ -84,18 +122,30 @@ function Register() {
         captchaToken
       );
       
+      console.log('[REGISTER] Server response received:', response.success ? '✅ Success' : '❌ Failed');
+      
       // Registration successful - redirect to 2FA setup (email auto-verified)
       if (response.success && response.user) {
+        console.log(`[REGISTER] ✅ Registration complete for ${formData.username}, redirecting to 2FA setup`);
         // Store user info and token for 2FA setup
         localStorage.setItem('user', JSON.stringify(response.user));
         localStorage.setItem('token', response.token);
         navigate('/setup-2fa');
+      } else {
+        const errorMsg = response.message || 'Registration failed. Please try again.';
+        console.error(`[REGISTER] Server error: ${errorMsg}`);
+        setError(errorMsg);
       }
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
+      const errorMsg = err.message || 'Registration failed. Please try again.';
+      console.error(`[REGISTER] ❌ Error: ${errorMsg}`);
+      console.error('[REGISTER] Stack:', err.stack);
+      setError(errorMsg);
       setSuccess(false);
       // Reset captcha on error
-      recaptchaRef.current.reset();
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
       setCaptchaToken(null);
     } finally {
       setLoading(false);

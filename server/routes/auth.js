@@ -28,52 +28,53 @@ const verifyToken = (req, res, next) => {
 };
 
 // Register a new user
-router.post('/register', async (req, res) => {
+router.post('/register', registerLimiter, registerValidator, async (req, res) => {
   try {
     const { username, email, password, captchaToken } = req.body;
     
-    console.log('=== Registration Attempt ===');
-    console.log('Username:', username);
-    console.log('Email:', email);
+    console.log(`[REGISTER] Attempt - Username: ${username}, Email: ${email}, Time: ${new Date().toISOString()}`);
 
     // Verify CAPTCHA token with Google
-    if (captchaToken) {
-      try {
-        const captchaResponse = await axios.post(
-          `https://www.google.com/recaptcha/api/siteverify`,
-          null,
-          {
-            params: {
-              secret: process.env.RECAPTCHA_SECRET_KEY,
-              response: captchaToken
-            }
-          }
-        );
-
-        console.log('CAPTCHA verification response:', captchaResponse.data);
-
-        if (!captchaResponse.data.success || captchaResponse.data.score < 0.5) {
-          return res.status(400).json({
-            success: false,
-            message: 'CAPTCHA verification failed. Please try again.'
-          });
-        }
-      } catch (captchaError) {
-        console.error('CAPTCHA verification error:', captchaError);
-        return res.status(400).json({
-          success: false,
-          message: 'Failed to verify CAPTCHA. Please try again.'
-        });
-      }
-    } else {
+    if (!captchaToken) {
+      console.warn(`[REGISTER] CAPTCHA missing for user: ${username}`);
       return res.status(400).json({
         success: false,
         message: 'CAPTCHA verification is required'
       });
     }
 
-    // Basic validation
+    try {
+      const captchaResponse = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify`,
+        null,
+        {
+          params: {
+            secret: process.env.RECAPTCHA_SECRET_KEY,
+            response: captchaToken
+          }
+        }
+      );
+
+      console.log(`[REGISTER] CAPTCHA score for ${username}: ${captchaResponse.data.score}`);
+
+      if (!captchaResponse.data.success || captchaResponse.data.score < 0.5) {
+        console.warn(`[REGISTER] CAPTCHA verification failed for ${username}, score: ${captchaResponse.data.score}`);
+        return res.status(400).json({
+          success: false,
+          message: 'CAPTCHA verification failed. Please try again.'
+        });
+      }
+    } catch (captchaError) {
+      console.error(`[REGISTER] CAPTCHA error for ${username}:`, captchaError.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Failed to verify CAPTCHA. Please try again.'
+      });
+    }
+
+    // Validation is now handled by middleware, but add extra checks here
     if (!username || !email || !password) {
+      console.warn(`[REGISTER] Missing fields for user attempt`);
       return res.status(400).json({ 
         success: false, 
         message: 'Username, email, and password are required' 
@@ -101,10 +102,8 @@ router.post('/register', async (req, res) => {
     ]);
     
     const user = result.rows[0];
-    console.log('User created successfully:', user.id);
-    console.log('✅ Email auto-verified on signup (development mode)');
-
-    console.log('=== Registration Successful ===');
+    console.log(`[REGISTER] ✅ User created successfully - ID: ${user.id}, Username: ${username}`);
+    console.log(`[REGISTER] Email auto-verified on signup`);
 
     // Auto-login after registration (email is auto-verified)
     const token = jwt.sign(
@@ -113,6 +112,8 @@ router.post('/register', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    console.log(`[REGISTER] ✅ Registration complete for ${username} at ${new Date().toISOString()}`);
+    
     return res.status(201).json({
       success: true,
       message: 'Registration successful. Please set up 2FA.',
@@ -125,20 +126,26 @@ router.post('/register', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('=== Registration Error ===');
-    console.error('Error message:', error.message);
+    console.error(`[REGISTER] ❌ Error for ${req.body.username || 'unknown'}: ${error.message}`);
+    console.error(`[REGISTER] Stack trace:`, error.stack);
     
     // Handle duplicate username/email
     if (error.code === '23505') {
+      console.warn(`[REGISTER] Duplicate username/email: ${email}`);
       return res.status(400).json({
         success: false,
         message: 'Username or email already exists'
       });
     }
     
+    // Log all database errors
+    if (error.code) {
+      console.error(`[REGISTER] Database error code: ${error.code}`);
+    }
+    
     return res.status(500).json({
       success: false,
-      message: 'Registration failed: ' + error.message
+      message: 'Registration failed. Please try again later.'
     });
   }
 });
@@ -251,8 +258,11 @@ router.post('/login', authLimiter, loginValidator, async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
+    console.log(`[LOGIN] Attempt - Email: ${email}, Time: ${new Date().toISOString()}`);
+
     // Validation
     if (!email || !password) {
+      console.warn(`[LOGIN] Missing credentials for ${email}`);
       return res.status(400).json({ 
         error: 'Email and password are required' 
       });
@@ -260,7 +270,7 @@ router.post('/login', authLimiter, loginValidator, async (req, res, next) => {
 
     // TEST USER - For immediate testing without database
     if (email === 'alex@test.com' && password === '123@123@') {
-      console.log('✅ TEST USER LOGIN: alex@test.com');
+      console.log(`[LOGIN] ✅ Test user logged in: ${email}`);
       const token = jwt.sign(
         { userId: 999, email: 'alex@test.com' },
         process.env.JWT_SECRET,
@@ -285,6 +295,7 @@ router.post('/login', authLimiter, loginValidator, async (req, res, next) => {
     );
 
     if (result.rows.length === 0) {
+      console.warn(`[LOGIN] User not found: ${email}`);
       return res.status(401).json({ 
         error: 'Invalid email or password' 
       });
@@ -296,6 +307,7 @@ router.post('/login', authLimiter, loginValidator, async (req, res, next) => {
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
     if (!isPasswordValid) {
+      console.warn(`[LOGIN] Invalid password for user: ${email}`);
       return res.status(401).json({ 
         error: 'Invalid email or password' 
       });
@@ -303,6 +315,7 @@ router.post('/login', authLimiter, loginValidator, async (req, res, next) => {
 
     // Check if email is verified
     if (!user.email_verified) {
+      console.warn(`[LOGIN] Email not verified for user: ${email}`);
       return res.status(403).json({
         success: false,
         error: 'Please verify your email before logging in. Check your inbox for the verification link.'
@@ -464,7 +477,10 @@ router.post('/verify-2fa-login', async (req, res) => {
   try {
     const { userId, verificationCode } = req.body;
 
+    console.log(`[2FA-LOGIN] Verification attempt - User ID: ${userId}, Time: ${new Date().toISOString()}`);
+
     if (!userId || !verificationCode) {
+      console.warn(`[2FA-LOGIN] Missing parameters - User ID: ${userId}, Code provided: ${!!verificationCode}`);
       return res.status(400).json({ error: 'User ID and verification code required' });
     }
 
@@ -475,6 +491,7 @@ router.post('/verify-2fa-login', async (req, res) => {
     );
 
     if (result.rows.length === 0) {
+      console.warn(`[2FA-LOGIN] Invalid user or 2FA not enabled - User ID: ${userId}`);
       return res.status(401).json({ error: 'Invalid user or 2FA not enabled' });
     }
 
@@ -490,6 +507,7 @@ router.post('/verify-2fa-login', async (req, res) => {
 
     if (isValidTotp) {
       // Valid TOTP code - generate login token
+      console.log(`[2FA-LOGIN] ✅ Valid TOTP code for user ID: ${userId}`);
       const token = jwt.sign(
         { userId: user.id },
         process.env.JWT_SECRET,
@@ -511,6 +529,7 @@ router.post('/verify-2fa-login', async (req, res) => {
 
     if (codeIndex !== -1) {
       // Valid backup code - remove it and generate login token
+      console.log(`[2FA-LOGIN] ✅ Valid backup code used for user ID: ${userId}, remaining codes: ${backupCodes.length - 1}`);
       backupCodes.splice(codeIndex, 1);
       
       await db.query(
@@ -533,6 +552,7 @@ router.post('/verify-2fa-login', async (req, res) => {
       });
     }
 
+    console.warn(`[2FA-LOGIN] Invalid verification code for user ID: ${userId}`);
     res.status(401).json({ error: 'Invalid verification code' });
   } catch (error) {
     console.error('2FA login verification error:', error);
