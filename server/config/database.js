@@ -7,10 +7,8 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 5432,
-  // ADD THESE SSL SETTINGS - Required for Supabase
-  ssl: {
-    rejectUnauthorized: false
-  }
+  // Disable SSL for local PostgreSQL
+  ssl: false
 });
 
 // Test connection
