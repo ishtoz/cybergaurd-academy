@@ -17,13 +17,13 @@ const PhishingWikiGuide = () => {
           <div className="wiki-toc">
             <h3>Contents</h3>
             <ul>
-              <li><a onClick={() => setActiveSection('overview')} className={activeSection === 'overview' ? 'active' : ''}>1. What is Phishing?</a></li>
-              <li><a onClick={() => setActiveSection('mechanics')} className={activeSection === 'mechanics' ? 'active' : ''}>2. How It Works</a></li>
-              <li><a onClick={() => setActiveSection('types')} className={activeSection === 'types' ? 'active' : ''}>3. Common Types</a></li>
-              <li><a onClick={() => setActiveSection('red-flags')} className={activeSection === 'red-flags' ? 'active' : ''}>4. Warning Signs</a></li>
-              <li><a onClick={() => setActiveSection('defense')} className={activeSection === 'defense' ? 'active' : ''}>5. How to Protect Yourself</a></li>
-              <li><a onClick={() => setActiveSection('examples')} className={activeSection === 'examples' ? 'active' : ''}>6. Real Examples</a></li>
-              <li><a onClick={() => setActiveSection('response')} className={activeSection === 'response' ? 'active' : ''}>7. What To Do If Phished</a></li>
+              <li><a href="#overview" onClick={(e) => {e.preventDefault(); setActiveSection('overview');}} className={activeSection === 'overview' ? 'active' : ''}>1. What is Phishing?</a></li>
+              <li><a href="#mechanics" onClick={(e) => {e.preventDefault(); setActiveSection('mechanics');}} className={activeSection === 'mechanics' ? 'active' : ''}>2. How It Works</a></li>
+              <li><a href="#types" onClick={(e) => {e.preventDefault(); setActiveSection('types');}} className={activeSection === 'types' ? 'active' : ''}>3. Common Types</a></li>
+              <li><a href="#red-flags" onClick={(e) => {e.preventDefault(); setActiveSection('red-flags');}} className={activeSection === 'red-flags' ? 'active' : ''}>4. Warning Signs</a></li>
+              <li><a href="#defense" onClick={(e) => {e.preventDefault(); setActiveSection('defense');}} className={activeSection === 'defense' ? 'active' : ''}>5. How to Protect Yourself</a></li>
+              <li><a href="#examples" onClick={(e) => {e.preventDefault(); setActiveSection('examples');}} className={activeSection === 'examples' ? 'active' : ''}>6. Real Examples</a></li>
+              <li><a href="#response" onClick={(e) => {e.preventDefault(); setActiveSection('response');}} className={activeSection === 'response' ? 'active' : ''}>7. What To Do If Phished</a></li>
             </ul>
           </div>
         </div>

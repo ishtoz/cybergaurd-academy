@@ -6,7 +6,6 @@ const StickyNote = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [credentials, setCredentials] = useState(null);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [emailProgress, setEmailProgress] = useState({ inbox: 0, processed: 0, total: 13 });
   const [whiteboardUnlocked, setWhiteboardUnlocked] = useState(false);
 
   // Handle Escape key to close sticky note

@@ -259,7 +259,7 @@ const EmailClient = ({ isOpen, onClose }) => {
       parts.push(
         <a
           key={`link-${lastIndex}`}
-          href="#"
+          href="javascript:void(0)"
           onClick={(e) => handleLinkClick(e, actualUrl)}
           className="email-link"
           title={`Link: ${actualUrl}`}

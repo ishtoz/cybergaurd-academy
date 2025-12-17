@@ -129,9 +129,10 @@ const ComputerScreen = ({ isOpen, onClose }) => {
       sidebarRef.current.addEventListener('mousedown', handleMouseDown);
     }
 
+    const element = sidebarRef.current;
     return () => {
-      if (sidebarRef.current) {
-        sidebarRef.current.removeEventListener('mousedown', handleMouseDown);
+      if (element) {
+        element.removeEventListener('mousedown', handleMouseDown);
       }
     };
   }, [sidebarWidth]);
@@ -515,7 +516,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [dialogue]);
+  }, [dialogue, onClose]);
 
   return (
     <>
