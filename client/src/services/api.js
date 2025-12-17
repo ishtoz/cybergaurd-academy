@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://web-production-80279.up.railway.app/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Helper function to get auth token from localStorage
 const getToken = () => {
