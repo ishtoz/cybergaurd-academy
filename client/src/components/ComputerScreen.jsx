@@ -252,7 +252,6 @@ const ComputerScreen = ({ isOpen, onClose }) => {
 
   const analyzeEmail = (email) => {
     setSelectedEmail(email);
-    setAnalyzed(true);
     
     // Mark as read
     setEmails(emails.map(e => 
@@ -301,7 +300,6 @@ const ComputerScreen = ({ isOpen, onClose }) => {
     }));
     
     setSelectedEmail(null);
-    setAnalyzed(false);
   };
 
   const keepEmail = (email) => {
@@ -345,7 +343,6 @@ const ComputerScreen = ({ isOpen, onClose }) => {
     }));
     
     setSelectedEmail(null);
-    setAnalyzed(false);
   };
 
   // Extract domain name from URL for friendly display
@@ -580,7 +577,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
                       <div className="sidebar-section-title">Mail</div>
                       <div 
                         className={`sidebar-item ${currentFolder === 'all-emails' ? 'active' : ''}`}
-                        onClick={() => { setCurrentFolder('all-emails'); setSelectedEmail(null); setAnalyzed(false); }}
+                        onClick={() => { setCurrentFolder('all-emails'); setSelectedEmail(null); }}
                         title="All Emails"
                       >
                         <span className="icon">📮</span>
@@ -590,7 +587,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
                       <div className="sidebar-section-title">Filtered Emails</div>
                       <div 
                         className={`sidebar-item ${currentFolder === 'phishing-emails' ? 'active' : ''}`}
-                        onClick={() => { setCurrentFolder('phishing-emails'); setSelectedEmail(null); setAnalyzed(false); }}
+                        onClick={() => { setCurrentFolder('phishing-emails'); setSelectedEmail(null); }}
                         title="Phishing Emails"
                       >
                         <span className="icon">⚠️</span>
@@ -599,7 +596,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
                       </div>
                       <div 
                         className={`sidebar-item ${currentFolder === 'safe-emails' ? 'active' : ''}`}
-                        onClick={() => { setCurrentFolder('safe-emails'); setSelectedEmail(null); setAnalyzed(false); }}
+                        onClick={() => { setCurrentFolder('safe-emails'); setSelectedEmail(null); }}
                         title="Safe Emails"
                       >
                         <span className="icon">✓</span>
@@ -615,8 +612,8 @@ const ComputerScreen = ({ isOpen, onClose }) => {
                       <div className="email-detail">
                         <div className="email-header">
                           <div className="folder-nav">
-                            <button className={`folder-btn ${currentFolder === 'all-emails' ? 'active' : ''}`} onClick={() => { setSelectedEmail(null); setAnalyzed(false); setCurrentFolder('all-emails'); }}>← All Emails</button>
-                            <button className={`folder-btn ${currentFolder === 'starred' ? 'active' : ''}`} onClick={() => { setSelectedEmail(null); setAnalyzed(false); setCurrentFolder('starred'); }}>★ Starred</button>
+                            <button className={`folder-btn ${currentFolder === 'all-emails' ? 'active' : ''}`} onClick={() => { setSelectedEmail(null); setCurrentFolder('all-emails'); }}>← All Emails</button>
+                            <button className={`folder-btn ${currentFolder === 'starred' ? 'active' : ''}`} onClick={() => { setSelectedEmail(null); setCurrentFolder('starred'); }}>★ Starred</button>
                           </div>
                           <div className="email-actions">
                             <button className="action-btn" title="Delete">🗑️</button>

@@ -160,7 +160,7 @@ function Register() {
           <div className="success-message-box">
             <div className="success-icon">✓</div>
             <h3>Account created successfully!</h3>
-            <p>We've sent a verification email to: <strong>{userEmail}</strong></p>
+            <p>We've sent a verification email to: <strong>{formData.email}</strong></p>
             <p>Please check your inbox and click the verification link.</p>
             <p className="note">Note: Check your spam folder if you don't see it.</p>
             <div className="button-group">
