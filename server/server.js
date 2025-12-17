@@ -16,7 +16,7 @@ app.use(helmet());
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://cybergaurd-academy.surge.sh'],
   credentials: true
 }));
 app.use(express.json());
